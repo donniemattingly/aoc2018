@@ -27,8 +27,15 @@ firstDuplicate =: 3 : 0
 	end.
 )
 
-accumulatingSums =: 3 : 0
-	n =. +/ \ y
+part2 =: verb define
+ input =. inputAsList input1
+ a=. ,
+ b=. 0
+ while. -. b do.
+ 	a =. a , input
+ 	b = firstDuplicate (+/ \ a)
+ end. 
+ b
 )
 
 NB. Solved With:
