@@ -31,7 +31,7 @@ part2 =: verb define
  input =. inputAsList input1
  a=. ,
  b=. 0
- while. -. b do.
+ while. b = 0 do.
  	a =. a , input
  	b = firstDuplicate (+/ \ a)
  end. 
