@@ -13,3 +13,23 @@ part1 =: 3 : 0
 	+/ y
 )
 
+containsDuplicates =: 3 : 0
+	(# y) ~: (# ~. y)
+)
+
+firstDuplicate =: 3 : 0
+	duplicatesTest =. (containsDuplicates \ y)
+	firstDuplicateIndex =. duplicatesTest i. 1
+	try.
+	result =. firstDuplicateIndex { y 
+	catch.
+	0
+	end.
+)
+
+accumulatingSums =: 3 : 0
+	n =. +/ \ y
+)
+
+NB. Solved With:
+NB. firstDuplicate (+/ \ (data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data, data ))
