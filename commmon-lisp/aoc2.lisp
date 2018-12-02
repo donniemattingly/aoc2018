@@ -54,7 +54,10 @@
 
 (defun get-common-chars (a b)
   (let ((achars (string-to-charlist a)) (bchars (string-to-charlist b)))
-    (format nil "~{~A~^~}" (reverse (mapcar (lambda (x) (car x)) (remove-if-not (lambda (x) (string-equal (car x) (cdr x))) (pairlis achars bchars)))))))
+    (format nil "~{~A~^~}" 
+            (reverse 
+             (mapcar (lambda (x) (car x)) 
+                     (remove-if-not (lambda (x) (string-equal (car x) (cdr x))) (pairlis achars bchars)))))))
 
 (defun parttwo (input)
   (loop for x in input
