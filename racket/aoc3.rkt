@@ -1,6 +1,7 @@
 #lang racket
 
 (require racket/file)
+(require math)
 
 (struct claim (id lOff tOff w h))
 
@@ -26,3 +27,13 @@
 
 (define (parsed-input)
   (map parse-row (input)))
+
+(define (max-claim-field-by claims max-fn) 
+  (apply max (map max-fn claims)))
+
+(define (max-loffset claims)
+  (apply max (map claim-lOff claims)))
+
+(define (part-one input)
+  0 )
+
