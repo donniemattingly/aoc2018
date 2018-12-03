@@ -107,10 +107,10 @@
            ]
           )
       (map (lambda (claim) (apply-claim arr claim)) input)
-      (filter 
-       (lambda (y) (empty? (filter not y))) 
-       (map (lambda (claim) 
-          (cons (claim-id claim) 
-                (test-claim arr claim))) 
-        input))
+      (car (car (filter 
+                 (lambda (y) (empty? (filter not y))) 
+                 (map (lambda (claim) 
+                        (cons (claim-id claim) 
+                              (test-claim arr claim))) 
+                      input))))
 )))
