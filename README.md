@@ -5,6 +5,13 @@
 
 My goal for this year is to solve each week's problem in a different language. 
 
+### Progress
+
+| Day  |  Language | Link to solution |
+| --- | --- | --- |
+| Day 1 | J | [Day 1](/j/aoc1.ijs)|
+| Day 2 | Common Lisp| [Day 2](/common-lisp/aoc2.lisp)
+
 Languages I'm currently Considering:
 
 1. Swift
