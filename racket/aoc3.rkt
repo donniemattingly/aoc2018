@@ -53,6 +53,19 @@
   (let ([cur-val (array-ref arr indices)])
     (array-set! arr indices (+ 1 cur-val))))
 
+(define (test-claim arr claim)
+  (let (
+        [left-offset (claim-lOff claim)] 
+        [top-offset (claim-tOff claim)]
+        [width (claim-w claim)]
+        [height (claim-h claim)])
+      (let ([indices (get-claim-area-indices left-offset top-offset width height)])
+        (map (lambda (idx) (test-claim-portion arr idx)) indices))))
+
+(define (test-claim-portion arr indices)
+  (let ([cur-val (array-ref arr indices)])
+    (= cur-val 1)))
+
 (define (get-claim-area-indices x y w h)
   (let ([indices (apply append (for/list ([i (in-range x (+ x w))])
                           (for/list ([j (in-range y (+ y h))])
@@ -80,3 +93,24 @@
       (sum (map (lambda (x) (if (> x 1) 1 0)) (array->list arr)))
 )))
 
+(define (part-two input)
+  (let ([max-lOff (max-claim-field-by input claim-lOff)]
+        [max-tOff (max-claim-field-by input claim-tOff)]
+        [max-w (max-claim-field-by input claim-w)]
+        [max-h (max-claim-field-by input claim-h)])
+    (let (
+          [arr 
+           (array->mutable-array (build-array 
+                                  (quasiquote #((unquote (+ max-lOff max-w)) (unquote (+ max-tOff max-h)))) 
+                                  (lambda (x) 0)
+                                  ))
+           ]
+          )
+      (map (lambda (claim) (apply-claim arr claim)) input)
+      (filter 
+       (lambda (y) (empty? (filter not y))) 
+       (map (lambda (claim) 
+          (cons (claim-id claim) 
+                (test-claim arr claim))) 
+        input))
+)))
