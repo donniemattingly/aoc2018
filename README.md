@@ -10,7 +10,8 @@ My goal for this year is to solve each week's problem in a different language.
 | Day  |  Language | Link to solution |
 | --- | --- | --- |
 | Day 1 | J | [Day 1](/j/aoc1.ijs)|
-| Day 2 | Common Lisp| [Day 2](/common-lisp/aoc2.lisp)
+| Day 2 | Common Lisp| [Day 2](/common-lisp/aoc2.lisp)|
+| Day 3 | Racket | [Day 3](/racket/aoc3.rkt)|
 
 Languages I'm currently Considering:
 
@@ -46,7 +47,7 @@ Languages I'm currently Considering:
 30. Idris
 31. J
 32. Lua
-33. Scheme
+33. Racket
 34. Nim
 
 [Here](https://docs.google.com/spreadsheets/d/1n4-w7unwe4NbI0Nfyhp4Ca8XlEOArJtDrGl_RJSIZoo/edit?usp=sharing) is a link to view my progress w/ each language.
