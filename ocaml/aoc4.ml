@@ -21,12 +21,12 @@ type guard_record =
 type guard_stats = 
   { total: int;
     min: int;
-    }
+  }
 
 let get_id v = 
-    match v with 
-    | Begin i -> i
-    | _ -> -1
+  match v with 
+  | Begin i -> i
+  | _ -> -1
 
 (* from https://stackoverflow.com/questions/5774934/how-do-i-read-in-lines-from-a-text-file-in-ocaml *)
 let read_lines name : string list =
@@ -53,21 +53,21 @@ let calc_timestamp record_string =
     day = List.nth t 2;
     hour = List.nth t 3;
     min = List.nth t 4;
-    }
+  }
 
 let begin_action_of_string str = 
   let guard_number = int_of_string (String.filter Char.is_digit str) in
   Begin guard_number
 
 let action_of_string = function
-| "wakes up" -> Wake
-| "falls asleep" -> Sleep
-| o -> begin_action_of_string o
+  | "wakes up" -> Wake
+  | "falls asleep" -> Sleep
+  | o -> begin_action_of_string o
 
 let get_action_of_record_string str =
   let action_string =  String.strip ( List.nth (String.split_on_char ']' str) 1) in
   action_of_string action_string
-                 
+  
 let parse_record record_string  =
   { action = get_action_of_record_string record_string;
     time = calc_timestamp record_string;
@@ -100,7 +100,7 @@ let identify_all_records records =
   let sorted_records = List.sort compare_record records in
   let final = List.fold_left identify_accumulator (-1, []) sorted_records in
   snd final
-            
+  
 
 let rec sublist b e l = 
   match l with
@@ -112,32 +112,53 @@ let rec sublist b e l =
 let get_begin_records records =
   let paired = List.mapi (fun i x -> (x, i)) records in
   let begins = List.filter (fun x -> let record = fst x in 
-                        match record.action with
-                          | Begin i -> true
-                          | _ -> false) paired
-                 in let begin_indices = List.map (fun x -> let (a,b) = x in b) begins
-                                          in begins
+                                     match record.action with
+                                     | Begin i -> true
+                                     | _ -> false) paired
+  in let begin_indices = List.map (fun x -> let (a,b) = x in b) begins
+     in begins
 
-let time_asleep_accumulator acc value = 
-  match value.action with
-    
+let get_min_between t1 t2 =
+  (43200 * (t2.month - t1.month)) + (1440 * (t2.day - t1.day)) + (60 * (t2.hour - t1.hour)) + (t2.min - t1.min)
+
+let get_initial_minute_arr ()  = 
+  Array.make 60 0
+
+let inc_array_at arr i =
+  let cur = Array.get arr i in
+  Array.set arr i (cur + 1)
+  
+
+let update_min_array arr duration start_time = 
+  let end_time = start_time + duration in
+  let indices = map (fun x -> x mod 60) (start_time -- end_time) in
+  BatEnum.fold (fun acc x -> inc_array_at acc x; acc) arr indices
+
+let guard_stats_accumulator acc value = 
+  let (previous, stats, minutes) = acc in 
+  match (previous.action, value.action) with
+    | (Sleep, Wake) -> let duration = get_min_between value.time previous.time in
+                       let start_min = previous.time.min in
+                       let updated = update_min_array minutes duration start_min in
+                       (value, { total = stats.total + duration;
+                         min = stats.min;
+                         },
+                        minutes)
+    | _ -> (value, stats, minutes)
+                                    
 let calc_guard_stats guard_records =
-  let foo = 1 in
-  let to
-  { total = foo;
-    min = foo;
-    }
+  List.fold_right guard_stats_accumulator (List.tl guard_records) (List.hd guard_records, {total = 0; min = 0;}, get_initial_minute_arr ()) 
 
 let get_guard_stats records = 
   let ids = List.sort_uniq compare (List.map (fun x -> x.id) records) in
   let filtered_records = (List.map (fun x -> (x, List.filter (fun y -> y.id = x) records)) ids) in
   let stats = List.map (fun x -> (fst x, calc_guard_stats (snd x))) filtered_records in
   stats
-  
+    
 
-(*
+    (*
 Examples of strings
 [1518-09-09 00:57] wakes up
 [1518-04-22 00:30] falls asleep
 [1518-08-30 00:00] Guard #1279 begins shift
- *)
+     *)
