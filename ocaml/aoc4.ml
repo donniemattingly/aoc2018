@@ -99,25 +99,8 @@ let identify_accumulator acc value =
 let identify_all_records records =
   let sorted_records = List.sort compare_record records in
   let final = List.fold_left identify_accumulator (-1, []) sorted_records in
-  snd final
+  List.rev (snd final)
   
-
-let rec sublist b e l = 
-  match l with
-    [] -> failwith "sublist"
-  | h :: t -> 
-     let tail = if e=0 then [] else sublist (b-1) (e-1) t in
-     if b>0 then tail else h :: tail
-
-let get_begin_records records =
-  let paired = List.mapi (fun i x -> (x, i)) records in
-  let begins = List.filter (fun x -> let record = fst x in 
-                                     match record.action with
-                                     | Begin i -> true
-                                     | _ -> false) paired
-  in let begin_indices = List.map (fun x -> let (a,b) = x in b) begins
-     in begins
-
 let get_min_between t1 t2 =
   (43200 * (t2.month - t1.month)) + (1440 * (t2.day - t1.day)) + (60 * (t2.hour - t1.hour)) + (t2.min - t1.min)
 
@@ -131,15 +114,18 @@ let inc_array_at arr i =
 
 let update_min_array arr duration start_time = 
   let end_time = start_time + duration in
-  let indices = map (fun x -> x mod 60) (start_time -- end_time) in
+  let indices = map (fun x -> x mod 60) (start_time -- (end_time - 1)) in
   BatEnum.fold (fun acc x -> inc_array_at acc x; acc) arr indices
 
 let guard_stats_accumulator acc value = 
   let (previous, stats, minutes) = acc in 
   match (previous.action, value.action) with
-    | (Sleep, Wake) -> let duration = get_min_between value.time previous.time in
+    | (Sleep, Wake) -> let duration = get_min_between previous.time value.time in
                        let start_min = previous.time.min in
                        let updated = update_min_array minutes duration start_min in
+                       Printf.printf "id: %i from: %i to %i\n" value.id previous.time.min value.time.min;
+                       Printf.printf "duration: %i\n" duration;
+                       Printf.printf "start_time: %i\n" start_min;
                        (value, { total = stats.total + duration;
                          min = stats.min;
                          },
@@ -147,15 +133,37 @@ let guard_stats_accumulator acc value =
     | _ -> (value, stats, minutes)
                                     
 let calc_guard_stats guard_records =
-  List.fold_right guard_stats_accumulator (List.tl guard_records) (List.hd guard_records, {total = 0; min = 0;}, get_initial_minute_arr ()) 
+  List.fold_left guard_stats_accumulator (List.hd guard_records, {total = 0; min = 0;}, get_initial_minute_arr ()) (List.tl guard_records)
 
 let get_guard_stats records = 
   let ids = List.sort_uniq compare (List.map (fun x -> x.id) records) in
   let filtered_records = (List.map (fun x -> (x, List.filter (fun y -> y.id = x) records)) ids) in
   let stats = List.map (fun x -> (fst x, calc_guard_stats (snd x))) filtered_records in
   stats
-    
 
+let get_total x =
+  let (r, stats, minutes) = (snd x) in
+  stats.total
+
+let most_time_asleep stats =
+  let sorted = List.sort (fun x y -> compare (get_total x) (get_total y)) stats in
+  List.hd (List.rev sorted)
+
+(*let get_most_common_min_asleep_for_guard arr =
+  let indexed = Array.to_list (Array.mapi (fun i x -> (i, x)) arr) in
+  List.hd (List.rev (List.sort (fun x y -> (compare (fst x) > (fst y))) indexed)) *)                       
+
+let max_freq value  = 
+  let (id, x) = value in
+  let (r, stats, arr) = x in 
+  let m = Array.max arr in
+  let tup = List.find (fun (x,y) -> y = m) (Array.to_list (Array.mapi (fun i x -> (i, x)) arr)) in
+  (id, m, tup)
+                            
+
+let guard_with_most_freq_asleep_min stats = 
+  let m = List.map max_freq stats in
+  m
     (*
 Examples of strings
 [1518-09-09 00:57] wakes up
