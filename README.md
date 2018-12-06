@@ -13,6 +13,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 2 | Common Lisp| [Day 2](/common-lisp/aoc2.lisp)|
 | Day 3 | Racket | [Day 3](/racket/aoc3.rkt)|
 | Day 4 | OCaml | [Day 4](/ocaml/aoc4.ml)|
+| Day 5 | F# | [Day 5](/fsharp/aoc5.fsx)|
 
 Languages I'm currently Considering:
 
