@@ -74,6 +74,17 @@ partOne :: Map.Map String [String] -> String
 partOne deps =
     reverse (assemble deps "")
 
+walkTimeLine :: (WorkerMap, DependencyMap, Int) -> Int
+
+assembleWithHelp :: (WorkerMap, DependencyMap, String, Int) -> (String, Int)
+assembleWithHelp (workers, deps, steps, time) = 
+    if deps == Map.empty
+        then (steps, time)
+    else 
+        let (nextStep, updatedDeps) = getNextStep deps in
+            let (steps, time) = assembleWithHelp (workers, updatedDeps, steps ++ nextStep, 0) in
+                    (steps, time)
+
 
 type WorkerMap = Map.Map String (Maybe String, Maybe Int)
 type DependencyMap = Map.Map String [String]
@@ -85,12 +96,41 @@ generateWorkerMap size =
         let emptyWorkers = foldl (\acc x -> Map.insert (show x) (Nothing, Nothing) acc) Map.empty r in
             emptyWorkers
 
+getAvailableWorker :: WorkerMap -> Maybe String
+getAvailableWorker workers = 
+    (List.find (\x -> (fst (snd x)) == Nothing) (Map.toList workers)) >>=
+        (\worker -> Just (fst (worker)))
+
+getTimeFromWorker :: (String, (Maybe String, Maybe Int)) -> Int
+getTimeFromWorker worker =
+    case snd (snd worker) of 
+        Just n -> n
+        Nothing -> maxBound :: Int
+
+getStepFromWorker :: (String, (Maybe String, Maybe Int)) -> String
+getStepFromWorker worker =
+    case fst (snd worker) of
+        Just s -> s
+        Nothing -> ""
+
+updateDepsAndWorkers :: (WorkerMap, DependencyMap, String) -> (WorkerMap, DependencyMap, Int)
+updateDepsAndWorkers (workers, deps, step) =
+    let workingWorkers = filter (\(name, (curStep, time)) -> curStep /= Nothing) (Map.toList workers) in
+        let nextWorkerToFinish = List.head (List.sortOn getTimeFromWorker workingWorkers) in
+            let updatedWorkers = Map.insert (fst nextWorkerToFinish) (Nothing, Nothing) workers in
+                let updatedDeps = updateDeps deps (getStepFromWorker nextWorkerToFinish) in
+                    (updatedWorkers, updatedDeps, getTimeFromWorker nextWorkerToFinish)
 
 -- very similar to getNextStep execept need to call new version of updateDeps
 -- that takes into account the worker map and remaining time
-getNextAssistedStep :: WorkerMap -> DependencyMap -> (WorkerMap, DependencyMap, String)
+getNextAssistedStep :: WorkerMap -> DependencyMap -> (WorkerMap, DependencyMap, Int, String)
 getNextAssistedStep workers deps =
     let iden = (workers, deps, "") in
-        iden
+        let availableSteps = map fst (filter (\x -> snd x == []) (Map.toList deps)) in
+            let sortedAvailableSteps = List.sort availableSteps in
+                let openWorker = getAvailableWorker workers in
+                    let nextStep = List.head availableSteps in
+                            let (updatedWorkers, updatedDeps, elapsedTime) = updateDepsAndWorkers (workers, deps, nextStep) in
+                                (updatedWorkers, updatedDeps, elapsedTime, nextStep)
 
 
