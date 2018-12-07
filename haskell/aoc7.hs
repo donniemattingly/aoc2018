@@ -8,13 +8,13 @@ testFileName = "../inputs/input-7.0.txt"
 fileName = "../inputs/input-7.1.txt"
 
 main = do  
-    handle <- openFile testFileName ReadMode  
+    handle <- openFile fileName ReadMode  
     contents <- hGetContents handle  
     let vals = map condenseDependency (readlines contents)
     let aggDeps = aggregateDependencies vals
-    let steps = allSteps vals
-    print $ steps
-    print $ aggDeps
+    let result = partOne aggDeps
+
+    print $ result
     hClose handle  
 
 readlines :: String -> [String]
@@ -62,5 +62,15 @@ getNextStep deps =
                 let updatedDeps = updateDeps deps nextStep in
                     (nextStep, updatedDeps)
 
--- assemble :: Map.Map String [String] -> String -> (Map.Map String [String], String)
--- assemble deps "" = 
+assemble :: Map.Map String [String] -> String -> String
+assemble deps steps = 
+    if deps == Map.empty
+        then steps
+    else 
+        let (nextStep, updatedDeps) = getNextStep deps in
+            assemble updatedDeps steps ++ nextStep
+ 
+
+partOne :: Map.Map String [String] -> String
+partOne deps =
+    reverse (assemble deps "")
