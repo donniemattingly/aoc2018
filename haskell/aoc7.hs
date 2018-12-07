@@ -69,8 +69,28 @@ assemble deps steps =
     else 
         let (nextStep, updatedDeps) = getNextStep deps in
             assemble updatedDeps steps ++ nextStep
- 
 
 partOne :: Map.Map String [String] -> String
 partOne deps =
     reverse (assemble deps "")
+
+
+type WorkerMap = Map.Map String (Maybe String, Maybe Int)
+type DependencyMap = Map.Map String [String]
+
+generateWorkerMap :: Int -> WorkerMap
+generateWorkerMap size =
+    -- Helpers + Individual
+    let r = [0..size] in
+        let emptyWorkers = foldl (\acc x -> Map.insert (show x) (Nothing, Nothing) acc) Map.empty r in
+            emptyWorkers
+
+
+-- very similar to getNextStep execept need to call new version of updateDeps
+-- that takes into account the worker map and remaining time
+getNextAssistedStep :: WorkerMap -> DependencyMap -> (WorkerMap, DependencyMap, String)
+getNextAssistedStep workers deps =
+    let iden = (workers, deps, "") in
+        iden
+
+
