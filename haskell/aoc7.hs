@@ -57,6 +57,10 @@ updateDeps deps step =
         let filteredDeps = map (\x -> (fst x, filter (\y -> y /= step) (snd x))) depsList in
             Map.delete step (Map.fromList filteredDeps)
 
+updateDeps2 :: Map.Map String [String] -> [String] -> Map.Map String [String]
+updateDeps2 deps steps =
+    foldl updateDeps deps steps
+
 getNextStep' :: Map.Map String [String] -> (String, Map.Map String [String])
 getNextStep' deps =
     let availableSteps = map fst (filter (\x -> snd x == []) (Map.toList deps)) in
@@ -117,7 +121,7 @@ assemble2 deps workers steps totalTime =
             let availableWorkers = trace ("availableSteps: " ++ show availableSteps) 5 - length workers in
                 let assignedWorkers = (assignWorkers availableSteps availableWorkers) ++ workers in
                     let (elapsedTime, completedSteps, updatedWorkers) = work assignedWorkers in            
-                        let updatedDeps = updateDeps deps (head completedSteps) in
+                        let updatedDeps = trace ("totalTime: " ++ show (totalTime + elapsedTime)) (updateDeps2 deps completedSteps) in
                             assemble2 updatedDeps updatedWorkers (steps ++ concat completedSteps) (totalTime + elapsedTime)
 
 partTwo :: Map.Map String [String] -> Int
