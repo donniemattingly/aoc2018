@@ -92,16 +92,16 @@ stepTime step = (Char.ord (head step)) - 4
 
 assignWorkers :: [String] -> Int -> [(Int, String)]
 assignWorkers availableSteps availableWorkers =
-    map (\x -> (stepTime x, x)) (take availableWorkers availableSteps)
+    let assigned = map (\x -> (stepTime x, x)) (take availableWorkers availableSteps) in
+        trace ("newlyAssignedWorkers: " ++ show assigned) assigned
 
 
 work :: [(Int, String)] -> (Int, [String], [(Int, String)])
 work workers = 
     let nextTime = minimum $ map fst workers in
-        let completedSteps = map (\y -> snd y) (filter (\x -> (fst x) == nextTime) workers) in
+        let completedSteps = trace ("curTime: " ++ show nextTime) map (\y -> snd y) (filter (\x -> (fst x) == nextTime) workers) in
             let updatedWorkers = map (\(time, step) -> (time - nextTime, step)) (filter (\x -> (fst x) /= nextTime) workers) in
-                let _ = trace (show nextTime) in
-                    (nextTime, completedSteps, updatedWorkers)
+                    trace ("steps: " ++ show completedSteps ++ " workers: " ++ show updatedWorkers) (nextTime, completedSteps, updatedWorkers)
 
 -- updateDepsForMultipleSteps :: Map.Map String [String] -> [String] -> Map.Map String [String]
 -- updateDepsForMultipleSteps deps steps =
@@ -110,15 +110,15 @@ work workers =
 assemble2 :: Map.Map String [String] -> [(Int, String)] -> String -> Int -> (String, Int)
 assemble2 deps workers steps totalTime = 
     if deps == Map.empty
-        then (steps, totalTime)
+        then trace (show (steps, totalTime)) (steps, totalTime)
     else 
-        let availableSteps = getAvailableSteps deps in
-            let availableWorkers = 6 - length workers in
+        let workingSteps = trace ("\n------------\n" ++ steps) map snd workers in
+        let availableSteps = filter (\x -> x `notElem` workingSteps) (getAvailableSteps deps) in
+            let availableWorkers = trace ("availableSteps: " ++ show availableSteps) 5 - length workers in
                 let assignedWorkers = (assignWorkers availableSteps availableWorkers) ++ workers in
-                    let (elapsedTime, completedSteps, updatedWorkers) = work workers in            
-                        let nextStep = getNextStep deps in
-                            let updatedDeps = foldl (\acc x -> updateDeps acc x) deps completedSteps in
-                                assemble2 updatedDeps workers (steps ++ nextStep) (totalTime + elapsedTime)
+                    let (elapsedTime, completedSteps, updatedWorkers) = work assignedWorkers in            
+                        let updatedDeps = updateDeps deps (head completedSteps) in
+                            assemble2 updatedDeps updatedWorkers (steps ++ concat completedSteps) (totalTime + elapsedTime)
 
 partTwo :: Map.Map String [String] -> Int
 partTwo deps =
