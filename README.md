@@ -15,6 +15,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 4 | OCaml | [Day 4](/ocaml/aoc4.ml)|
 | Day 5 | F# | [Day 5](/fsharp/aoc5.fsx)|
 | Day 6 | Julia | [Day 6](/julia/aoc6.jl)|
+| Day 7 | Haskell | [Day 7](/haskell/Aoc7.hs)|
 
 Languages I'm currently Considering:
 
