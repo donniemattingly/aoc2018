@@ -74,6 +74,13 @@ parseNode([ChildCount | [MetaDataCount | Data]]) ->
 partone() ->
     io:format("Advent of Code Day 8~n"),
     Input = realInput(),
+    Result = parseNode1(Input),
+    io:format("Result:\n"),
+    io:write(Result).
+
+parttwo() ->
+    io:format("Advent of Code Day 8~n"),
+    Input = realInput(),
     Result = parseNode(Input),
     io:format("Result:\n"),
     io:write(Result).
