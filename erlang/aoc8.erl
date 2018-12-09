@@ -15,7 +15,7 @@ log(Value) ->
     log(Value, "").
 
 log(Value, Name) ->
-    io:format(Name ++ ": \n"),
+    io:format(Name ++ ": "),
     io:write(Value),
     io:format("\n").
 
@@ -30,18 +30,46 @@ parseInput(Input) ->
     Ints = lists:map(fun(X) -> {Int, _ } = string:to_integer(X), Int end, IntStrings),
     Ints.
 
+parseNode1([0 | [MetaDataCount | Data]]) ->
+    {MetaData, NewData} = lists:split(MetaDataCount, Data),
+    {lists:sum(MetaData), NewData};
+
+parseNode1([ChildCount | [MetaDataCount | Data]]) ->
+    {Total, NewData} = lists:foldl(
+                         fun(_, {RunningTotal, RunningData}) ->
+                                 {ChildSum, NewData} = parseNode1(RunningData),
+                                 {ChildSum + RunningTotal, NewData}
+                         end, {0, Data}, lists:seq(0, ChildCount - 1)),
+    {MetaData, NewerData} = lists:split(MetaDataCount, NewData),
+    {lists:sum(MetaData) + Total, NewerData}.
+
 parseNode([0 | [MetaDataCount | Data]]) ->
     {MetaData, NewData} = lists:split(MetaDataCount, Data),
     {lists:sum(MetaData), NewData};
 
 parseNode([ChildCount | [MetaDataCount | Data]]) ->
-    {Total, NewData} = lists:foldl(
-      fun(_, {RunningTotal, RunningData}) ->
-              {ChildSum, NewData} = parseNode(RunningData),
-              {ChildSum + RunningTotal, NewData}
-      end, {0, Data}, lists:seq(0, ChildCount - 1)),
+    {ReversedTotals, NewData} = lists:foldl(
+                          fun(_, {Totals, RunningData}) ->
+                                  {ChildSum, NewData} = parseNode(RunningData),
+                                  {[ChildSum | Totals], NewData}
+                          end, {[], Data}, lists:seq(0, ChildCount - 1)),
+    Totals = lists:reverse(ReversedTotals),
     {MetaData, NewerData} = lists:split(MetaDataCount, NewData),
-    {lists:sum(MetaData) + Total, NewerData}.
+    log(MetaData, "MetaData"),
+    log(Totals, "Totals"),
+    Sum = lists:foldl(
+            fun(MetaDatum, Sum) -> 
+                    log(MetaDatum, "Datum"),
+                    log(Sum, "Sum"),
+                    if
+                        MetaDatum > length(Totals) ->
+                            Sum;
+                        true ->
+                            lists:nth(MetaDatum, Totals) + Sum
+                    end
+            end,
+            0, MetaData),
+    {Sum, NewerData}.
 
 partone() ->
     io:format("Advent of Code Day 8~n"),
