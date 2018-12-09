@@ -8,6 +8,9 @@
 testInput() ->
     getInput("../inputs/input-8.0.txt").
 
+realInput() ->
+    getInput("../inputs/input-8.1.txt").
+
 log(Value) ->
     log(Value, "").
 
@@ -27,31 +30,23 @@ parseInput(Input) ->
     Ints = lists:map(fun(X) -> {Int, _ } = string:to_integer(X), Int end, IntStrings),
     Ints.
 
-parseNode(All = [ChildCount | [MetaDataCount | Tail]]) ->
-    log(All, "Parsing"),
-    parseNode(ChildCount, MetaDataCount, {[], [], Tail}).
+parseNode([0 | [MetaDataCount | Data]]) ->
+    {MetaData, NewData} = lists:split(MetaDataCount, Data),
+    {lists:sum(MetaData), NewData};
 
-parseNode(0, MetaDataCount, Res = {ParsedChildren, MetaData, Remaining}) ->
-    log({0, MetaDataCount, Res}, "ChildCount == 0"),
-    {FinalMetaData, NewRemaining} = lists:split(MetaDataCount, Remaining),
-    {[], FinalMetaData, NewRemaining};
-
-parseNode(ChildCount, MetaDataCount, Res = {ParsedChildren, MetaData, Remaining}) 
-  when length(ParsedChildren) == ChildCount->
-    log({ChildCount, MetaDataCount, Res}, "ChildCount == ParsedChildren Length"),
-    {MetaData, Remaining} = lists:split(length(Remaining) - MetaDataCount, Remaining),
-    {ParsedChildren, MetaData, Remaining};
-
-parseNode(ChildCount, MetaDataCount, Res = {ParsedChildren, MetaData, Remaining}) ->
-    log({ChildCount, MetaDataCount, Res}, "No Guards/Matches"),
-    {AdditionalChildren, NewMetaData, NewRemaining} = parseNode(Remaining),
-    {ParsedChildren ++ AdditionalChildren, NewMetaData, NewRemaining}.
-
+parseNode([ChildCount | [MetaDataCount | Data]]) ->
+    {Total, NewData} = lists:foldl(
+      fun(_, {RunningTotal, RunningData}) ->
+              {ChildSum, NewData} = parseNode(RunningData),
+              {ChildSum + RunningTotal, NewData}
+      end, {0, Data}, lists:seq(0, ChildCount - 1)),
+    {MetaData, NewerData} = lists:split(MetaDataCount, NewData),
+    {lists:sum(MetaData) + Total, NewerData}.
 
 partone() ->
     io:format("Advent of Code Day 8~n"),
-    Input = testInput(),
-    Result = parseNode(?SimpleTestInput),
+    Input = realInput(),
+    Result = parseNode(Input),
     io:format("Result:\n"),
     io:write(Result).
 
