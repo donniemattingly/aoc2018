@@ -17,6 +17,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 6 | Julia | [Day 6](/julia/aoc6.jl)|
 | Day 7 | Haskell | [Day 7](/haskell/Aoc7.hs)|
 | Day 8 | Erlang | [Day 8](/erlang/aoc8.erl)|
+| Day 9 | C++ | [Day 9](/c++/aoc9.cpp)|
 
 Languages I'm currently Considering:
 
