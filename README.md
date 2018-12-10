@@ -18,6 +18,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 7 | Haskell | [Day 7](/haskell/Aoc7.hs)|
 | Day 8 | Erlang | [Day 8](/erlang/aoc8.erl)|
 | Day 9 | C++ | [Day 9](/c++/aoc9.cpp)|
+| Day 10 | Clojure | [Day 10](/clojure/aoc10/src/aoc10/core.clj)|
 
 Languages I'm currently Considering:
 
