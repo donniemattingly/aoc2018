@@ -85,17 +85,14 @@
      (display-particles 
       (:p (get-particles-with-smallest-area particles 
                                             (get-box-area (get-bounding-box particles))
-                                            0))))
-)
-
+                                            0)))))
 
 (defn part-two
   []
   (let [particles (parse-input "input-10.1.txt")]
      (:count (get-particles-with-smallest-area particles 
                                            (get-box-area (get-bounding-box particles))
-                                           0)))
-)
+                                           0))))
 
 (defn parse-input
   [filename]
