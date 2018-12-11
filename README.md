@@ -19,6 +19,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 8 | Erlang | [Day 8](/erlang/aoc8.erl)|
 | Day 9 | C++ | [Day 9](/c++/aoc9.cpp)|
 | Day 10 | Clojure | [Day 10](/clojure/aoc10/src/aoc10/core.clj)|
+| Day 11 | Groovy | [Day 11](/groovy/src/Aoc11.groovy)|
 
 Languages I'm currently Considering:
 

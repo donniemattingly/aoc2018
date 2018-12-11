@@ -3,8 +3,8 @@ import groovy.transform.Memoized
 
 import java.util.concurrent.atomic.AtomicInteger
 
-
-def calculateFuelCellPowerLevel(int x, int y, int serialNumber) {
+@Memoized
+static int calculateFuelCellPowerLevel(int x, int y, int serialNumber) {
     def rackId = x + 10
     def raw = ((rackId * y) + serialNumber) * rackId
     def powerlevel = (Math.floorDiv(raw, 100) % 10) - 5
