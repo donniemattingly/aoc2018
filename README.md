@@ -12,6 +12,13 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 1 | J | [Day 1](/j/aoc1.ijs)|
 | Day 2 | Common Lisp| [Day 2](/common-lisp/aoc2.lisp)|
 | Day 3 | Racket | [Day 3](/racket/aoc3.rkt)|
+| Day 4 | OCaml | [Day 4](/ocaml/aoc4.ml)|
+| Day 5 | F# | [Day 5](/fsharp/aoc5.fsx)|
+| Day 6 | Julia | [Day 6](/julia/aoc6.jl)|
+| Day 7 | Haskell | [Day 7](/haskell/Aoc7.hs)|
+| Day 8 | Erlang | [Day 8](/erlang/aoc8.erl)|
+| Day 9 | C++ | [Day 9](/c++/aoc9.cpp)|
+| Day 10 | Clojure | [Day 10](/clojure/aoc10/src/aoc10/core.clj)|
 
 Languages I'm currently Considering:
 
