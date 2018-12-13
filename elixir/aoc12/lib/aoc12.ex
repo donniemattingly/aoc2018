@@ -163,10 +163,13 @@ defmodule Aoc12 do
 
   def part_two() do
     {{state, zero_cursor}, rules} = parsed_input(@real_input)
-    generation_count = 2000
+    generation_count = 140
     {end_state, end_cursor, region_size, score_diff} = run_generations2(state, rules, zero_cursor, generation_count)
     final_score = get_score(end_state, end_cursor)
-    (50_000_000_000 - 2000) * score_diff + final_score
+    result = (50_000_000_000 - 2000) * score_diff + final_score
+    IO.puts(result)
+
+    result
   end
 
   def measure(function) do
