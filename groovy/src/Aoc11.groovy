@@ -73,11 +73,11 @@ def partTwo() {
 //        }
 //    }
 
-    GParsPool.withPool {
-        final List result = [1, 2, 3, 4, 5].collectParallel{it * 2}
-
-        assert ([2, 4, 6, 8, 10].equals(result))
-    }
+//    GParsPool.withPool {
+//        final List result = [1, 2, 3, 4, 5].collectParallel{it * 2}
+//
+//        assert ([2, 4, 6, 8, 10].equals(result))
+//    }
 
     for(int i = 1; i < 301; i++){
         println("on: ${i}")
