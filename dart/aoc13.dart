@@ -224,7 +224,7 @@ void sortCartExecutionOrder(List<Cart> carts){
 
 void tick(Grid grid){
   sortCartExecutionOrder(grid.carts);
-  
+
 }
 
 
