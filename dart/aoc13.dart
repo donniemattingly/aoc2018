@@ -25,7 +25,7 @@ class Cart {
   num nextIntersectionChoice = 0;
 
   Path currentPath;
-  Path lastPath;
+  List<Path> previousPaths = new List();
 
   void left() => this.direction = 0;
 
@@ -60,7 +60,7 @@ class Cart {
   }
 
   String toString(){
-    return "Cart{char: ${this.char()} direction: ${this.direction} nextTurn: ${this.nextIntersectionChoice} current: ${this.currentPath} last: ${this.lastPath}}";
+    return "Cart{char: ${this.char()} direction: ${this.direction} nextTurn: ${this.nextIntersectionChoice} current: ${this.currentPath} last: ${this.previousPaths}}";
   }
 
   String char() {
@@ -345,7 +345,7 @@ void advanceCart(Cart cart) {
   }
 
   cart.currentPath = nextPath;
-  cart.lastPath = currentPath;
+  cart.previousPaths.add(currentPath);
 }
 
 Point checkForCollision(List<Cart> carts) {
@@ -384,7 +384,7 @@ String testFile = "../inputs/input-13.0.txt";
 String realFile = "../inputs/input-13.1.txt";
 
 partOne() {
-  var grid = getGridFromFile(realFile);
+  var grid = getGridFromFile(testFile);
   Point collisionPoint;
   num tickCount = 0;
   while(collisionPoint == null){
