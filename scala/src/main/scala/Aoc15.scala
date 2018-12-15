@@ -206,12 +206,12 @@ object Aoc15 {
 
   def sortReadingOrder[C <: Cell](cells: List[C]): List[C] = {
     cells.sortWith((a, b) => {
-      a.pos._2 * 9999 + a.pos._1 < b.pos._2 * 9999 + b.pos._1
+      a.pos._1 * 9999 + a.pos._2 < b.pos._1 * 9999 + b.pos._2
     })
   }
 
   def turn(combatant: Combatant, cave: Cave): Unit = {
-//    println(cave.display())
+    println(cave.display())
     val targets: List[Combatant] = combatant.identifyTargets(cave.combatants)
     if (targets.isEmpty) return
 
@@ -222,9 +222,13 @@ object Aoc15 {
 
       if (reachableCells.isEmpty) return
 
-      val selectedPath = reachableCells.minBy(_.length)
+      val selectedPathLen = reachableCells.minBy(_.length).length
+      val potentialPaths = reachableCells.filter(p => p.length == selectedPathLen)
+      val selectedPath = potentialPaths.zip(potentialPaths.map(p => p.head)).sortWith((a, b) => {
+        a._2.pos._1 * 9999 + a._2.pos._2 > b._2.pos._1 * 9999 + b._2.pos._2
+      }).head._1
 
-      cave.swapCells(combatant, selectedPath.head)
+      cave.swapCells(combatant, selectedPath.last)
 
     } else {
       val victim = victims.head
@@ -246,8 +250,8 @@ object Aoc15 {
 
   def partOne(): Unit = {
     val cave = caveFromFile(test_file)
-    println(cave.display())
-    for (a <- 1 to 10) {
+//    println(cave.display())
+    for (a <- 1 to 1) {
       round(a, cave)
       println(cave.display())
     }
