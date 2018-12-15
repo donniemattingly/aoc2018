@@ -128,7 +128,7 @@ partTwo pattern =
    
 main = 
     let 
-        result = partTwo "825401"
+        result = partOne 10000000
         _ = Debug.log "result" result
     in
     Html.text "Hello World"

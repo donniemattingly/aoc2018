@@ -21,6 +21,8 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 10 | Clojure | [Day 10](/clojure/aoc10/src/aoc10/core.clj)|
 | Day 11 | Groovy | [Day 11](/groovy/src/Aoc11.groovy)|
 | Day 12 | Elixir | [Day 12](/elixir/aoc12/lib/aoc12.ex)|
+| Day 13 | Dart | [Incomplete](/dart/aoc12.dart)|
+| Day 14 | Elm | [Day 14](/elm/sample-app/src/Main.elm)|
 
 Languages I'm currently Considering:
 
