@@ -42,9 +42,9 @@ class Cell(var pos: Position, var terrain: Terrain, val symbol: String) {
 
 
   def adjacent(otherCell: Cell): Boolean = {
-    if(this.pos.x == otherCell.pos.x){
+    if (this.pos.x == otherCell.pos.x) {
       Math.abs(this.pos.y - otherCell.pos.y) == 1
-    } else if(this.pos.y == otherCell.pos.y){
+    } else if (this.pos.y == otherCell.pos.y) {
       Math.abs(this.pos.x - otherCell.pos.x) == 1
     } else {
       false
@@ -73,7 +73,11 @@ class Combatant(pos: Position, var ap: Int, var hp: Int, symbol: String) extends
 
   def attack(otherCombatant: Combatant): Combatant = {
     otherCombatant.hp = otherCombatant.hp - this.ap
-    if (otherCombatant.hp < 0) otherCombatant else null
+    if (otherCombatant.hp < 0) {
+      otherCombatant
+    } else {
+      null
+    }
   }
 
   def display(): String = {
@@ -113,7 +117,7 @@ class Goblin(pos: Position, ap: Int, hp: Int) extends Combatant(pos, ap, hp, "G"
 }
 
 class Cave(val landscape: Array[Array[Cell]],
-           val combatants: List[Combatant]) {
+           var combatants: List[Combatant]) {
 
   def combatantsAtLine(line: Int): String = {
     "     " + this.combatants
@@ -179,12 +183,6 @@ class Cave(val landscape: Array[Array[Cell]],
 
 
 object Aoc15 {
-  def test_file = "../inputs/input-15.0.txt"
-
-  def test_file2 = "../inputs/input-15.2.txt"
-
-  def real_file = "../inputs/input-15.1.txt"
-
   def readFile(fileName: String): Array[Array[String]] = {
     Source.fromFile(fileName).getLines.toArray.map(line => line.split(""))
   }
@@ -403,12 +401,12 @@ object Aoc15 {
     })
   }
 
-  def turn(combatant: Combatant, cave: Cave): Unit = {
+  def turn(combatant: Combatant, cave: Cave): Boolean = {
     //    println(cave.display())
     val targets: List[Combatant] = combatant.identifyTargets(cave.combatants)
-    if (targets.isEmpty) return
+    if (targets.isEmpty) return false
 
-    val victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
+    var victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
     if (victims.isEmpty) {
       //      val openCells: List[Cell] = sortReadingOrder(targets.flatMap(target => adjacentOpenCells(target, cave.landscape)))
       //      val reachableCells: List[List[Cell]] = openCells.flatMap(cell => search(combatant, cell.pos, cave)).filter(p => p != null)
@@ -429,7 +427,7 @@ object Aoc15 {
       val (closestReachableCells, minDist) = otherSearch(cave, combatant, openCells)
 
       if (closestReachableCells.isEmpty) {
-        return
+        return true
       }
 
       val selectedCell = closestReachableCells.toList.minBy(readingOrder)
@@ -438,7 +436,7 @@ object Aoc15 {
       var nextCell: Cell = null
       for (c <- nearbyCells) {
         val (_, distance) = otherSearch(cave, c, List(selectedCell))
-        if (distance == minDist - 1  && nextCell == null) {
+        if (distance == minDist - 1 && nextCell == null) {
           nextCell = c
         }
       }
@@ -446,46 +444,64 @@ object Aoc15 {
       cave.swapCells(combatant, nextCell)
 
 
-    } else {
+    }
+
+    victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
+
+    if(victims.nonEmpty){
       val victim = victims.head
       val killed = combatant.attack(victim)
 
       if (killed != null) {
-        // TODO handle kills
+        val killed_pos = killed.pos
+        val replacement = new Cell(killed_pos, Terrain.OPEN, ".")
+        cave.landscape(killed_pos.y)(killed_pos.x) = replacement
+        cave.combatants = cave.combatants.filter(p => !p.equals(killed))
       }
     }
 
-
+    true
   }
 
-  def round(roundNum: Int, cave: Cave): Int = {
+  def round(cave: Cave): Boolean = {
     val orderedCombatants = sortReadingOrder(cave.combatants)
-    orderedCombatants.foreach(cell => turn(cell, cave))
-    roundNum + 1
+    for (combatant <- orderedCombatants) {
+      if (!turn(combatant, cave)) {
+        return false
+      }
+    }
+
+    true
   }
 
-  def partOne(): Unit = {
+  def test_file = "../inputs/input-15.s1.txt"
+
+  def pathing_test = "../inputs/input-15.2.txt"
+
+  def combat_test = "../inputs/input-15.combat_sample.txt"
+
+  def real_file = "../inputs/input-15.1.txt"
+
+  def partOne(): Int = {
     val cave = caveFromFile(test_file)
-    println(cave.display())
-    for (a <- 1 to 3) {
-      round(a, cave)
+    var targetsRemain: Boolean = true
+    var rounds: Int = 0
+    while (targetsRemain) {
+      targetsRemain = round(cave)
+      if (targetsRemain) {
+        rounds += 1
+      }
+
+      println(s"\n ----- Round $rounds ----- \n")
       println(cave.display())
     }
 
-    //    val root = new Cell(new Position(0, 0), Terrain.OPEN, ".")
-    //    val child1 = new Cell(new Position(1, 1), Terrain.OPEN, ".")
-    //    val child2 = new Cell(new Position(2, 2), Terrain.OPEN, ".")
-    //
-    //    root.parents += child1
-    //    root.parents += child2
-    //
-    //    val result = getPaths(root)
-    //
-    //    println(result)
+    //    println(cave.display())
+    rounds * cave.combatants.map(c => c.hp).sum
   }
 
   def main(args: Array[String]): Unit = {
-    this.partOne()
+    println(this.partOne())
   }
 }
 
