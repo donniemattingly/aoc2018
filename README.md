@@ -23,6 +23,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 12 | Elixir | [Day 12](/elixir/aoc12/lib/aoc12.ex)|
 | Day 13 | Dart | [Incomplete](/dart/aoc13.dart)|
 | Day 14 | Elm | [Day 14](/elm/sample-app/src/Main.elm)|
+| Day 15 | Scala | [Day 15](/scala/src/main/scala/Aoc15.scala)|
 
 Languages I'm currently Considering:
 
