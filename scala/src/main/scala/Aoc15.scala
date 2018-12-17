@@ -190,7 +190,7 @@ object Aoc15 {
   val defaultHp = 200
   val defaultAp = 3
 
-  def caveFromFile(fileName: String): Cave = {
+  def caveFromFile(fileName: String, power: Int): Cave = {
     val raw = Aoc15.readFile(fileName)
     var combatants = new ListBuffer[Combatant]
 
@@ -199,6 +199,9 @@ object Aoc15 {
         case (chr, j) => {
           val terrainUnit = convertCharToTerrainUnit(chr, j, i)
           terrainUnit match {
+            case elf: Elf =>
+              elf.ap = power
+              combatants = combatants += elf
             case combatant: Combatant =>
               combatants = combatants += combatant
             case _ =>
@@ -475,7 +478,7 @@ object Aoc15 {
           return false
         }
       } else{
-        println(s"done: ${combatant.toString()}")
+//        println(s"done: ${combatant.toString()}")
       }
     }
 
@@ -490,8 +493,8 @@ object Aoc15 {
 
   def real_file = "../inputs/input-15.1.txt"
 
-  def partOne(): Int = {
-    val cave = caveFromFile(real_file)
+  def partOne(): Unit = {
+    val cave = caveFromFile(real_file, 3)
     var targetsRemain: Boolean = true
     var rounds: Int = 0
     while (targetsRemain) {
@@ -505,11 +508,53 @@ object Aoc15 {
     }
 
     //    println(cave.display())
-    rounds * cave.combatants.map(c => c.hp).sum
+    println("part 1: " + rounds * cave.combatants.map(c => c.hp).sum)
+  }
+
+  def partTwo(): Unit = {
+    var elf_died = true
+    var power = 3
+    var result = 0
+    while(elf_died){
+
+    val cave = caveFromFile(real_file, power)
+      val elf_count = cave.combatants.count {
+        case _: Elf => true
+        case _ => false
+      }
+    var targetsRemain: Boolean = true
+    var rounds: Int = 0
+    while (targetsRemain) {
+      targetsRemain = round(cave)
+      if (targetsRemain) {
+        rounds += 1
+      }
+
+      println(s"\n ----- Round $rounds ----- \n")
+      println(cave.display())
+    }
+
+    result = rounds * cave.combatants.map(c => c.hp).sum
+
+      val new_elf_count = cave.combatants.count {
+        case _: Elf => true
+        case _ => false
+      }
+
+
+      if(new_elf_count == elf_count){
+        elf_died = false
+      }
+
+      power = power + 1
+      println(s"power: $power")
+    }
+
+    println("Part 2: " + result)
   }
 
   def main(args: Array[String]): Unit = {
-    println(this.partOne())
+    this.partTwo()
   }
 }
 
