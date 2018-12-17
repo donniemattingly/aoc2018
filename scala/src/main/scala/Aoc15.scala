@@ -403,10 +403,12 @@ object Aoc15 {
 
   def turn(combatant: Combatant, cave: Cave): Boolean = {
     //    println(cave.display())
+    if(combatant.hp <= 0) return true
+
     val targets: List[Combatant] = combatant.identifyTargets(cave.combatants)
     if (targets.isEmpty) return false
 
-    var victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
+    var victims = targets.filter(c => c.adjacent(combatant))
     if (victims.isEmpty) {
       //      val openCells: List[Cell] = sortReadingOrder(targets.flatMap(target => adjacentOpenCells(target, cave.landscape)))
       //      val reachableCells: List[List[Cell]] = openCells.flatMap(cell => search(combatant, cell.pos, cave)).filter(p => p != null)
@@ -446,10 +448,12 @@ object Aoc15 {
 
     }
 
-    victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
+    val adjacentTargets = targets.filter(c => c.adjacent(combatant))
 
-    if(victims.nonEmpty){
-      val victim = victims.head
+    if(adjacentTargets.nonEmpty){
+      val minHp = adjacentTargets.minBy(_.hp).hp
+      val sortedVictims = sortReadingOrder(adjacentTargets.filter(t => t.hp == minHp))
+      val victim = sortedVictims.head
       val killed = combatant.attack(victim)
 
       if (killed != null) {
@@ -466,15 +470,19 @@ object Aoc15 {
   def round(cave: Cave): Boolean = {
     val orderedCombatants = sortReadingOrder(cave.combatants)
     for (combatant <- orderedCombatants) {
-      if (!turn(combatant, cave)) {
-        return false
+      if(cave.combatants.contains(combatant)){
+        if (!turn(combatant, cave)) {
+          return false
+        }
+      } else{
+        println(s"done: ${combatant.toString()}")
       }
     }
 
     true
   }
 
-  def test_file = "../inputs/input-15.s1.txt"
+  def test_file = "../inputs/input-15.s5.txt"
 
   def pathing_test = "../inputs/input-15.2.txt"
 
@@ -483,7 +491,7 @@ object Aoc15 {
   def real_file = "../inputs/input-15.1.txt"
 
   def partOne(): Int = {
-    val cave = caveFromFile(test_file)
+    val cave = caveFromFile(real_file)
     var targetsRemain: Boolean = true
     var rounds: Int = 0
     while (targetsRemain) {
