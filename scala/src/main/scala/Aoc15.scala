@@ -9,11 +9,40 @@ object Terrain extends Enumeration {
   val WALL, OPEN, UNIT = Value
 }
 
-class Cell(var pos: (Int, Int), var terrain: Terrain, val symbol: String) {
-  var pathParent: Cell = _
+class Position(var x: Int, var y: Int) {
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Position]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Position =>
+      (that canEqual this) &&
+        x == that.x &&
+        y == that.y
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(x, y)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+
+  override def toString = s"Pos($x, $y)"
+}
+
+class Cell(var pos: Position, var terrain: Terrain, val symbol: String) {
+  var parents: ListBuffer[Cell] = new ListBuffer()
+  var level: Int = -1
+
+  def addParent(parent: Cell): Unit ={
+    if(parent.level != this.level){
+      this.parents += parent
+      this.level = parent.level + 1
+    }
+  }
+
 
   def adjacent(otherCell: Cell): Boolean = {
-    (Math.abs(this.pos._1 - otherCell.pos._1) == 1) || (Math.abs(this.pos._2 - otherCell.pos._2) == 1)
+    (Math.abs(this.pos.x - otherCell.pos.x) == 1) || (Math.abs(this.pos.y - otherCell.pos.y) == 1)
   }
 
 
@@ -35,11 +64,19 @@ class Cell(var pos: (Int, Int), var terrain: Terrain, val symbol: String) {
   }
 }
 
-class Combatant(pos: (Int, Int), var ap: Int, var hp: Int, symbol: String) extends Cell(pos, Terrain.UNIT, symbol) {
+class Combatant(pos: Position, var ap: Int, var hp: Int, symbol: String) extends Cell(pos, Terrain.UNIT, symbol) {
 
   def attack(otherCombatant: Combatant): Combatant = {
     otherCombatant.hp = otherCombatant.hp - this.ap
     if (otherCombatant.hp < 0) otherCombatant else null
+  }
+
+  def display(): String = {
+    this match {
+      case _: Elf => s"E(${this.hp})"
+      case _: Goblin => s"G(${this.hp})"
+      case _ => ""
+    }
   }
 
   def identifyTargets(potentialTargets: List[Combatant]): List[Combatant] = {
@@ -62,24 +99,56 @@ class Combatant(pos: (Int, Int), var ap: Int, var hp: Int, symbol: String) exten
   override def toString = s"Combatant(${this.pos} ${this.ap} ${this.hp})"
 }
 
-class Elf(pos: (Int, Int), ap: Int, hp: Int) extends Combatant(pos, ap, hp, "E") {
+class Elf(pos: Position, ap: Int, hp: Int) extends Combatant(pos, ap, hp, "E") {
   override def toString: String = s"Elf(${this.pos} ${this.ap} ${this.hp})"
 }
 
-class Goblin(pos: (Int, Int), ap: Int, hp: Int) extends Combatant(pos, ap, hp, "G") {
+class Goblin(pos: Position, ap: Int, hp: Int) extends Combatant(pos, ap, hp, "G") {
   override def toString: String = s"Goblin(${this.pos} ${this.ap} ${this.hp})"
 }
 
 class Cave(val landscape: Array[Array[Cell]],
            val combatants: List[Combatant]) {
 
+  def combatantsAtLine(line: Int): String = {
+    "     " + this.combatants
+      .filter(c => c.pos.y == line)
+      .map(c => c.display())
+      .mkString(", ")
+  }
+
   def display(): String = {
-    this.landscape.map(cells => {
+    this.landscape.zipWithIndex.map(input => {
+      val cells = input._1
+      val idx = input._2
       cells.map {
         case _: Elf => "E"
         case _: Goblin => "G"
         case c: Cell => if (c.terrain == Terrain.OPEN) "." else "#"
-      }.mkString("")
+      }.mkString("") + combatantsAtLine(idx)
+    }).mkString("\n")
+  }
+
+  def displayPath(path: List[Cell]): String = {
+    val pathMap = path.map(p => p.pos -> p).toMap
+    this.landscape.zipWithIndex.map(input => {
+      val cells = input._1
+      val i = input._2
+      cells.zipWithIndex.map(input => {
+        val j = input._2
+        val cell = input._1
+        val curPos = new Position(j, i)
+
+        if (pathMap.contains(curPos)) {
+          "X"
+        } else {
+          cell match {
+            case _: Elf => "E"
+            case _: Goblin => "G"
+            case c: Cell => if (c.terrain == Terrain.OPEN) "." else "#"
+          }
+        }
+      }).mkString("")
     }).mkString("\n")
   }
 
@@ -89,14 +158,16 @@ class Cave(val landscape: Array[Array[Cell]],
     cell1.pos = cell2.pos
     cell2.pos = cell1pos
 
-    this.landscape(cell1.pos._2)(cell1.pos._1) = cell1
-    this.landscape(cell2.pos._2)(cell2.pos._1) = cell2
+    this.landscape(cell1.pos.y)(cell1.pos.x) = cell1
+    this.landscape(cell2.pos.y)(cell2.pos.x) = cell2
   }
 }
 
 
 object Aoc15 {
   def test_file = "../inputs/input-15.0.txt"
+
+  def test_file2 = "../inputs/input-15.2.txt"
 
   def real_file = "../inputs/input-15.1.txt"
 
@@ -114,7 +185,7 @@ object Aoc15 {
     val landscape: Array[Array[Cell]] = raw.zipWithIndex.map {
       case (line, i) => line.zipWithIndex.map {
         case (chr, j) => {
-          val terrainUnit = convertCharToTerrainUnit(chr, i, j)
+          val terrainUnit = convertCharToTerrainUnit(chr, j, i)
           terrainUnit match {
             case combatant: Combatant =>
               combatants = combatants += combatant
@@ -131,7 +202,8 @@ object Aoc15 {
   def adjacentOpenCells(cell: Cell, cells: Array[Array[Cell]]): List[Cell] = {
     val height = cells.length
     val width = cells(0).length
-    val (x, y) = cell.pos
+    val x = cell.pos.x
+    val y = cell.pos.y
 
     List((x, y + 1), (x, y - 1), (x - 1, y), (x + 1, y))
       .filter(p => {
@@ -143,7 +215,7 @@ object Aoc15 {
   }
 
   def convertCharToTerrainUnit(value: String, x: Int, y: Int): Cell = {
-    val pos = (x, y)
+    val pos = new Position(x, y)
 
     if (value == "#") {
       new Cell(pos, Terrain.WALL, value)
@@ -158,44 +230,93 @@ object Aoc15 {
     }
   }
 
-  def constructPath(node: Cell): List[Cell] = {
-    var path = new ListBuffer[Cell]()
-    var current = node
-    while ( {
-      current.pathParent != null
-    }) {
-      path += current
-      current = current.pathParent
-    }
+  // Getting a stack overflow here so something is obviously failing
+  def dfs(n: Cell, result: ListBuffer[List[Cell]], path: ListBuffer[Cell]): Unit = {
+    path.prepend(n)
 
-    path.toList
+    if (n.parents.isEmpty) { // base case: we came to target vertex
+      result += path.toList
+    }
+    for (p <- n.parents) {
+      dfs(p, result, path)
+    }
+    // do not forget to remove the processed element from path
+    path.remove(0)
   }
 
+//  def constructPath(node: Cell): List[Cell] = {
+//    var path = new ListBuffer[Cell]()
+//    var current = node
+//    while ( {
+//      current.pathParent != null
+//    }) {
+//      path += current
+//      current = current.pathParent
+//    }
+//
+//    path.toList
+//  }
 
-  // totally ripped off from: http://www.peachpit.com/articles/article.aspx?p=101142
-  def search(startNode: Cell, goal: (Int, Int), allCells: Array[Array[Cell]]): List[Cell] = { // list of visited nodes
+
+//  // totally ripped off from: http://www.peachpit.com/articles/article.aspx?p=101142
+//  def old_search(startNode: Cell, goal: Position, cave: Cave): List[Cell] = { // list of visited nodes
+//    val closedList = new ListBuffer[Cell]
+//    // list of nodes to visit (sorted)
+//    val openList = new mutable.Queue[Cell]()
+//    startNode.pathParent = null
+//    openList.enqueue(startNode)
+//
+//    while (openList.nonEmpty) {
+//      val node = openList.dequeue()
+//      if (node.pos == goal) { // path found!
+//        return constructPath(node)
+//      }
+//      else {
+//        closedList += node
+//        // add neighbors to the open list
+//        val i = adjacentOpenCells(node, cave.landscape).iterator
+//        while (i.hasNext) {
+//          val neighborNode = i.next
+//          if (!closedList.contains(neighborNode) && !openList.contains(neighborNode)) {
+//            neighborNode.pathParent = node
+//            openList += neighborNode
+//          }
+//        }
+//      }
+//    }
+//    // no path found
+//    null
+//  }
+
+  // https://ideone.com/UluCBb
+  def search(startNode: Cell, goal: Position, cave: Cave): ListBuffer[List[Cell]] = { // list of visited nodes
     val closedList = new ListBuffer[Cell]
     // list of nodes to visit (sorted)
     val openList = new mutable.Queue[Cell]()
-    startNode.pathParent = null
+    startNode.parents = new ListBuffer[Cell]
+    startNode.level = 0
+
     openList.enqueue(startNode)
 
     while (openList.nonEmpty) {
       val node = openList.dequeue()
-      if (node.pos eq goal) { // path found!
-        return constructPath(node)
+      if (node.pos == goal) { // path found!
+        val result = new ListBuffer[List[Cell]]()
+        val path = new ListBuffer[Cell]()
+        dfs(node, result, path)
+        return result
       }
       else {
         closedList += node
         // add neighbors to the open list
-        val i = adjacentOpenCells(node, allCells).iterator
-        while ( {
-          i.hasNext
-        }) {
+        val i = adjacentOpenCells(node, cave.landscape).iterator
+        while (i.hasNext) {
           val neighborNode = i.next
-          if (!closedList.contains(neighborNode) && !openList.contains(neighborNode)) {
-            neighborNode.pathParent = node
-            openList += neighborNode
+          if (!closedList.contains(neighborNode)) {
+            if (!openList.contains(neighborNode)) {
+              openList += neighborNode
+            }
+            neighborNode.addParent(node)
           }
         }
       }
@@ -204,30 +325,35 @@ object Aoc15 {
     null
   }
 
+  def compareReadingOrder[C <: Cell](a: C, b: C): Boolean = {
+    a.pos.y * 9999 + a.pos.x < b.pos.y * 9999 + b.pos.x
+  }
+
   def sortReadingOrder[C <: Cell](cells: List[C]): List[C] = {
     cells.sortWith((a, b) => {
-      a.pos._1 * 9999 + a.pos._2 < b.pos._1 * 9999 + b.pos._2
+      compareReadingOrder(a, b)
     })
   }
 
   def turn(combatant: Combatant, cave: Cave): Unit = {
-    println(cave.display())
+    //    println(cave.display())
     val targets: List[Combatant] = combatant.identifyTargets(cave.combatants)
     if (targets.isEmpty) return
 
     val victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
     if (victims.isEmpty) {
       val openCells: List[Cell] = sortReadingOrder(targets.flatMap(target => adjacentOpenCells(target, cave.landscape)))
-      val reachableCells: List[List[Cell]] = openCells.map(cell => search(combatant, cell.pos, cave.landscape)).filter(p => p != null)
+      val reachableCells: List[List[Cell]] = openCells.flatMap(cell => search(combatant, cell.pos, cave)).filter(p => p != null)
 
       if (reachableCells.isEmpty) return
 
       val selectedPathLen = reachableCells.minBy(_.length).length
       val potentialPaths = reachableCells.filter(p => p.length == selectedPathLen)
       val selectedPath = potentialPaths.zip(potentialPaths.map(p => p.head)).sortWith((a, b) => {
-        a._2.pos._1 * 9999 + a._2.pos._2 > b._2.pos._1 * 9999 + b._2.pos._2
+        compareReadingOrder(a._2, b._2)
       }).head._1
 
+      println(cave.displayPath(selectedPath))
       cave.swapCells(combatant, selectedPath.last)
 
     } else {
@@ -250,8 +376,8 @@ object Aoc15 {
 
   def partOne(): Unit = {
     val cave = caveFromFile(test_file)
-//    println(cave.display())
-    for (a <- 1 to 1) {
+    println(cave.display())
+    for (a <- 1 to 3) {
       round(a, cave)
       println(cave.display())
     }
