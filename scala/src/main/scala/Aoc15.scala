@@ -33,8 +33,8 @@ class Cell(var pos: Position, var terrain: Terrain, val symbol: String) {
   var parents: ListBuffer[Cell] = new ListBuffer()
   var level: Int = -1
 
-  def addParent(parent: Cell): Unit ={
-    if(parent.level != this.level){
+  def addParent(parent: Cell): Unit = {
+    if (parent.level != this.level) {
       this.parents += parent
       this.level = parent.level + 1
     }
@@ -42,9 +42,14 @@ class Cell(var pos: Position, var terrain: Terrain, val symbol: String) {
 
 
   def adjacent(otherCell: Cell): Boolean = {
-    (Math.abs(this.pos.x - otherCell.pos.x) == 1) || (Math.abs(this.pos.y - otherCell.pos.y) == 1)
+    if(this.pos.x == otherCell.pos.x){
+      Math.abs(this.pos.y - otherCell.pos.y) == 1
+    } else if(this.pos.y == otherCell.pos.y){
+      Math.abs(this.pos.x - otherCell.pos.x) == 1
+    } else {
+      false
+    }
   }
-
 
   override def toString = s"Cell($pos, $terrain)"
 
@@ -115,6 +120,15 @@ class Cave(val landscape: Array[Array[Cell]],
       .filter(c => c.pos.y == line)
       .map(c => c.display())
       .mkString(", ")
+  }
+
+  def resetAfterSearch(): Unit = {
+    for (line <- this.landscape) {
+      for (cell <- line) {
+        cell.level = -1
+        cell.parents = null
+      }
+    }
   }
 
   def display(): String = {
@@ -244,52 +258,67 @@ object Aoc15 {
     path.remove(0)
   }
 
-//  def constructPath(node: Cell): List[Cell] = {
-//    var path = new ListBuffer[Cell]()
-//    var current = node
-//    while ( {
-//      current.pathParent != null
-//    }) {
-//      path += current
-//      current = current.pathParent
-//    }
-//
-//    path.toList
-//  }
+
+  //  def constructPath(node: Cell): List[Cell] = {
+  //    var path = new ListBuffer[Cell]()
+  //    var current = node
+  //    while ( {
+  //      current.pathParent != null
+  //    }) {
+  //      path += current
+  //      current = current.pathParent
+  //    }
+  //
+  //    path.toList
+  //  }
 
 
-//  // totally ripped off from: http://www.peachpit.com/articles/article.aspx?p=101142
-//  def old_search(startNode: Cell, goal: Position, cave: Cave): List[Cell] = { // list of visited nodes
-//    val closedList = new ListBuffer[Cell]
-//    // list of nodes to visit (sorted)
-//    val openList = new mutable.Queue[Cell]()
-//    startNode.pathParent = null
-//    openList.enqueue(startNode)
-//
-//    while (openList.nonEmpty) {
-//      val node = openList.dequeue()
-//      if (node.pos == goal) { // path found!
-//        return constructPath(node)
-//      }
-//      else {
-//        closedList += node
-//        // add neighbors to the open list
-//        val i = adjacentOpenCells(node, cave.landscape).iterator
-//        while (i.hasNext) {
-//          val neighborNode = i.next
-//          if (!closedList.contains(neighborNode) && !openList.contains(neighborNode)) {
-//            neighborNode.pathParent = node
-//            openList += neighborNode
-//          }
-//        }
-//      }
-//    }
-//    // no path found
-//    null
-//  }
+  //  // totally ripped off from: http://www.peachpit.com/articles/article.aspx?p=101142
+  //  def old_search(startNode: Cell, goal: Position, cave: Cave): List[Cell] = { // list of visited nodes
+  //    val closedList = new ListBuffer[Cell]
+  //    // list of nodes to visit (sorted)
+  //    val openList = new mutable.Queue[Cell]()
+  //    startNode.pathParent = null
+  //    openList.enqueue(startNode)
+  //
+  //    while (openList.nonEmpty) {
+  //      val node = openList.dequeue()
+  //      if (node.pos == goal) { // path found!
+  //        return constructPath(node)
+  //      }
+  //      else {
+  //        closedList += node
+  //        // add neighbors to the open list
+  //        val i = adjacentOpenCells(node, cave.landscape).iterator
+  //        while (i.hasNext) {
+  //          val neighborNode = i.next
+  //          if (!closedList.contains(neighborNode) && !openList.contains(neighborNode)) {
+  //            neighborNode.pathParent = node
+  //            openList += neighborNode
+  //          }
+  //        }
+  //      }
+  //    }
+  //    // no path found
+  //    null
+  //  }
+
+  def getPaths(node: Cell): List[List[Cell]] = {
+    getPathsRecur(node, List())
+  }
+
+  def getPathsRecur(node: Cell, path: List[Cell]): List[List[Cell]] = {
+    val working_path = node :: path
+
+    if (node.parents.isEmpty) {
+      List(working_path)
+    } else {
+      node.parents.toList.flatMap(p => getPathsRecur(p, working_path))
+    }
+  }
 
   // https://ideone.com/UluCBb
-  def search(startNode: Cell, goal: Position, cave: Cave): ListBuffer[List[Cell]] = { // list of visited nodes
+  def search(startNode: Cell, goal: Position, cave: Cave): List[List[Cell]] = { // list of visited nodes
     val closedList = new ListBuffer[Cell]
     // list of nodes to visit (sorted)
     val openList = new mutable.Queue[Cell]()
@@ -301,10 +330,11 @@ object Aoc15 {
     while (openList.nonEmpty) {
       val node = openList.dequeue()
       if (node.pos == goal) { // path found!
-        val result = new ListBuffer[List[Cell]]()
-        val path = new ListBuffer[Cell]()
-        dfs(node, result, path)
-        return result
+        //        val result = new ListBuffer[List[Cell]]()
+        //        val path = new ListBuffer[Cell]()
+        //        dfs(node, result, path)
+        //        return result
+        return getPaths(node)
       }
       else {
         closedList += node
@@ -325,8 +355,46 @@ object Aoc15 {
     null
   }
 
+  def otherSearch(cave: Cave, start: Cell, targets: List[Cell]): (ListBuffer[Cell], Int) = {
+    val target_set: Set[Cell] = targets.toSet
+    var visited = Set[Cell]()
+    var min_distance: Int = -1
+    var queue: Vector[(Cell, Int)] = Vector((start, 0))
+    val closest_nodes = new ListBuffer[Cell]
+
+    while (queue.nonEmpty) {
+      val (cell, distance) = queue.take(1)(0)
+      queue = queue.drop(1)
+
+      if (min_distance != -1 && distance > min_distance) {
+        return (closest_nodes, min_distance)
+      }
+
+      if (!visited.contains(cell)) {
+        visited = visited + cell
+
+        if (target_set.contains(cell)) {
+          min_distance = distance
+          closest_nodes += cell
+        }
+
+        for (n <- adjacentOpenCells(cell, cave.landscape)) {
+          if (!visited.contains(n)) {
+            queue = queue :+ (n, distance + 1)
+          }
+        }
+      }
+    }
+
+    (closest_nodes, min_distance)
+  }
+
+  def readingOrder[C <: Cell](a: C): Int = {
+    a.pos.y * 9999 + a.pos.x
+  }
+
   def compareReadingOrder[C <: Cell](a: C, b: C): Boolean = {
-    a.pos.y * 9999 + a.pos.x < b.pos.y * 9999 + b.pos.x
+    readingOrder(a) < readingOrder(b)
   }
 
   def sortReadingOrder[C <: Cell](cells: List[C]): List[C] = {
@@ -342,19 +410,41 @@ object Aoc15 {
 
     val victims = targets.filter(c => c.adjacent(combatant)).sortBy(_.hp)
     if (victims.isEmpty) {
+      //      val openCells: List[Cell] = sortReadingOrder(targets.flatMap(target => adjacentOpenCells(target, cave.landscape)))
+      //      val reachableCells: List[List[Cell]] = openCells.flatMap(cell => search(combatant, cell.pos, cave)).filter(p => p != null)
+      //
+      //      if (reachableCells.isEmpty) return
+      //
+      //      val selectedPathLen = reachableCells.minBy(_.length).length
+      //      val potentialPaths = reachableCells.filter(p => p.length == selectedPathLen)
+      //      val selectedPath = potentialPaths.zip(potentialPaths.map(p => p.head)).sortWith((a, b) => {
+      //        compareReadingOrder(a._2, b._2)
+      //      }).head._1
+      //
+      //      println(cave.displayPath(selectedPath))
+      //      cave.swapCells(combatant, selectedPath.last)
+
+
       val openCells: List[Cell] = sortReadingOrder(targets.flatMap(target => adjacentOpenCells(target, cave.landscape)))
-      val reachableCells: List[List[Cell]] = openCells.flatMap(cell => search(combatant, cell.pos, cave)).filter(p => p != null)
+      val (closestReachableCells, minDist) = otherSearch(cave, combatant, openCells)
 
-      if (reachableCells.isEmpty) return
+      if (closestReachableCells.isEmpty) {
+        return
+      }
 
-      val selectedPathLen = reachableCells.minBy(_.length).length
-      val potentialPaths = reachableCells.filter(p => p.length == selectedPathLen)
-      val selectedPath = potentialPaths.zip(potentialPaths.map(p => p.head)).sortWith((a, b) => {
-        compareReadingOrder(a._2, b._2)
-      }).head._1
+      val selectedCell = closestReachableCells.toList.minBy(readingOrder)
+      val nearbyCells = sortReadingOrder(adjacentOpenCells(combatant, cave.landscape))
 
-      println(cave.displayPath(selectedPath))
-      cave.swapCells(combatant, selectedPath.last)
+      var nextCell: Cell = null
+      for (c <- nearbyCells) {
+        val (_, distance) = otherSearch(cave, c, List(selectedCell))
+        if (distance == minDist - 1  && nextCell == null) {
+          nextCell = c
+        }
+      }
+
+      cave.swapCells(combatant, nextCell)
+
 
     } else {
       val victim = victims.head
@@ -381,6 +471,17 @@ object Aoc15 {
       round(a, cave)
       println(cave.display())
     }
+
+    //    val root = new Cell(new Position(0, 0), Terrain.OPEN, ".")
+    //    val child1 = new Cell(new Position(1, 1), Terrain.OPEN, ".")
+    //    val child2 = new Cell(new Position(2, 2), Terrain.OPEN, ".")
+    //
+    //    root.parents += child1
+    //    root.parents += child2
+    //
+    //    val result = getPaths(root)
+    //
+    //    println(result)
   }
 
   def main(args: Array[String]): Unit = {
