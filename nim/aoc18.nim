@@ -13,7 +13,7 @@ for line in lines "../inputs/input-18.1.txt":
   board.add(board_line)
 
 
-proc printBoard(board: array[50, array[50, char]]) =
+proc printBoard(board: seq[seq[char]]) =
   var output = ""
   for line in board:
     var rowStr = ""
@@ -22,7 +22,7 @@ proc printBoard(board: array[50, array[50, char]]) =
     output = output & rowStr & "\n"
   echo output
 
-proc neighbors(x: int, y: int, b: array[50, array[50, char]]): seq[char] =
+proc neighbors(x: int, y: int, b: seq[seq[char]]): seq[char] =
   var points = [
     [x-1, y-1],
     [x, y-1],
@@ -44,10 +44,6 @@ proc neighbors(x: int, y: int, b: array[50, array[50, char]]): seq[char] =
   return neighbors
 
 
-var neighbors = array[8, char]
-proc fastRestul(x: int, y: int, old_board: array[50, array[50, char]]) =
-  
-      
 proc acreResult(acre: char, neighbors: seq[char]): char =
   if(acre == '.'):
     if(count(neighbors, '|') >= 3):
@@ -63,7 +59,7 @@ proc acreResult(acre: char, neighbors: seq[char]): char =
   return acre
 
 
-proc resourceScore(board: array[50, array[50, char]]): int =
+proc resourceScore(board: seq[seq[char]]): int =
   var woods = 0
   var lumberyards = 0
 
@@ -76,25 +72,44 @@ proc resourceScore(board: array[50, array[50, char]]): int =
   
   return woods * lumberyards
 
+printBoard(board)
 
+var temp_board: seq[seq[char]] = @[]
 
-var a_board: array[50, array[50, char]]
-var b_board: array[50, array[50, char]]
-for i,row in board:
-  for j,col in row:
-    b_board[i][j] = board[i][j]
+var scores = {-1 : -1}.newTable
+var minutes = {-1 : -1}.newTable
+var period = -1
+var last_minute = -1
 
-var old = b_board
-var new = a_board
-
-for minute in 1..1000000000:
+for minute in 1..1000:
+  last_minute = minute
+  var new_board: seq[seq[char]] = @[]
   for i,row in board:
+    var new_row: seq[char] = @[]
     for j,col in row:
-      new[i][j] = acreResult(old[i][j], neighbors(i,j,old))
-  var t = old
-  old = new
-  new = t
-  if minute %% 1000 == 0:
-    echo minute
-      
-echo resourceScore(old)
+      var cur = board[i][j]
+      new_row.add(acreResult(cur, neighbors(i,j,board)))
+    new_board.add(new_row)
+  board = new_board
+  var score = resourceScore(board)
+  minutes[minute] = score
+
+  if hasKey(scores, score):
+    var this_period = minute - scores[score]
+    if this_period == period:
+      last_minute = minute - 1
+    else:
+      period = this_period
+    # echo fmt"Repeat at {minute} diff: {minute - scores[score]} score: {score}"
+  else:
+    scores[score] = minute
+  
+  # if minute %% 1000 == 0:
+    # echo fmt"After {minute} minutes:"
+    # echo resourceScore(board)
+
+echo fmt"period: {period} last_min: {last_minute}"
+
+last_minute = 455
+period = 28
+echo minutes[((1000000000 - last_minute) %% 28) + last_minute]
