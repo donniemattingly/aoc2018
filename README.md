@@ -21,7 +21,7 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 10 | Clojure | [Day 10](/clojure/aoc10/src/aoc10/core.clj)|
 | Day 11 | Groovy | [Day 11](/groovy/src/Aoc11.groovy)|
 | Day 12 | Elixir | [Day 12](/elixir/aoc12/lib/aoc12.ex)|
-| Day 13 | Dart | [Incomplete](/dart/aoc13.dart)|
+| Day 13 | Dart | [Day 13](/dart/aoc13take2.dart)|
 | Day 14 | Elm | [Day 14](/elm/sample-app/src/Main.elm)|
 | Day 15 | Scala | [Day 15](/scala/src/main/scala/Aoc15.scala)|
 | Day 16 | Perl | [Day 16](/perl/aoc16.pl)|
