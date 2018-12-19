@@ -25,7 +25,10 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 14 | Elm | [Day 14](/elm/sample-app/src/Main.elm)|
 | Day 15 | Scala | [Day 15](/scala/src/main/scala/Aoc15.scala)|
 | Day 16 | Perl | [Day 16](/perl/aoc16.pl)|
+| Day 17 | Crystal | [Day 17](/crystal/aoc17.cr)|
 | Day 18 | Nim | [Day 18](/nim/aoc18.nim)|
+
+
 Languages I'm currently Considering:
 
 1. Swift
