@@ -3,7 +3,7 @@
 [Advent of Code](https://adventofcode.com)
    Advent of Code is a series of small programming puzzles for a variety of skill sets and skill levels in any programming language you like. People use them as a speed contest, interview prep, company training, university coursework, practice problems, or to challenge each other.
 
-My goal for this year is to solve each week's problem in a different language. 
+My goal for this year is to solve each day's problem in a different language. 
 
 ### Progress
 
