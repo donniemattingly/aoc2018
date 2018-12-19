@@ -28,7 +28,6 @@ My goal for this year is to solve each week's problem in a different language.
 | Day 17 | Crystal | [Day 17](/crystal/aoc17.cr)|
 | Day 18 | Nim | [Day 18](/nim/aoc18.nim)|
 
-
 Languages I'm currently Considering:
 
 1. Swift
