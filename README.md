@@ -27,6 +27,7 @@ My goal for this year is to solve each day's problem in a different language.
 | Day 16 | Perl | [Day 16](/perl/aoc16.pl)|
 | Day 17 | Crystal | [Day 17](/crystal/aoc17.cr)|
 | Day 18 | Nim | [Day 18](/nim/aoc18.nim)|
+| Day 19 | Ruby | [Day 19](/ruby/aoc19.rb)|
 
 Languages I'm currently Considering:
 
