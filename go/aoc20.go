@@ -13,21 +13,61 @@ func main() {
 	}
 	var input = strings.Trim(string(b), " \n")
 	fmt.Println(input)
-	var size = longestOptionSize(input)
+	var size = foo(input)
 	fmt.Println(size)
 }
 
 var option = regexp.MustCompile(`\(.*\)`)
+
+/*
+
+ */
+
+func tokenizeString(x string) []string {
+	var paren_depth = 0
+	var result []string
+	var group_start = 0
+	for pos, char := range x {
+		if char == '(' {
+			paren_depth++
+			group_start = pos
+		} else if char == ')' {
+			paren_depth--
+			if(paren_depth == 0){
+				result = append(result, string(x[group_start:pos]))
+			}
+		}
+	}
+
+	return result
+}
 func longestOptionSize(x string) int{
-	var result = option.FindString(x)
+	//var result = option.FindString(x)
+
+	var paren_depth = 0
+	var result []string
+	var group_start = 0
+	for pos, char := range x {
+		if char == '(' {
+			paren_depth++
+			group_start = pos
+		} else if char == ')' {
+			paren_depth--
+			if(paren_depth == 0){
+				result = append(result, string(x[group_start:pos]))
+			}
+		}
+	}
 
 	if(result == ""){
 		return len(x)
 	}
 
 	var base = len(x) - len(result)
+
+
 	var stripped = result[1:len(result) - 1]
-	fmt.Println(stripped)
+	//fmt.Println(stripped)
 	var max = 0
 	var split = splitTopLevel(stripped)
 
@@ -40,7 +80,6 @@ func longestOptionSize(x string) int{
 
 	return base + max
 }
-
 func splitTopLevel(s string) []string {
 	var result []string 
 	var paren_depth = 0
@@ -60,4 +99,44 @@ func splitTopLevel(s string) []string {
 	// fmt.Println(s)
 	// fmt.Println(result)
 	return result
+}
+
+func foo(s string) int {
+	var base []string
+	var options []string
+	var paren_depth = 0
+	var last_split = 0
+	for pos, char := range s {
+		if char == '(' {
+			if paren_depth == 0 {
+				base = append(base, string(s[last_split:pos-1]))
+				last_split = pos + 1
+			}
+			paren_depth++
+		} else if char == ')' {
+			paren_depth--
+			if paren_depth == 0 {
+				options = append(options, string(s[last_split:pos]))
+				last_split = pos + 1
+			}
+		} else if char == '|' && paren_depth == 0 {
+			options = append(options, string(s[last_split:pos]))
+			last_split = pos + 1
+		}
+	}
+
+	base = append(base, string(s[last_split]))
+	var size = 0
+	for _, val := range options {
+		var cur_size = foo(val)
+		if cur_size > size {
+			size = cur_size
+		}
+	}
+
+	var total = len(base) + size
+	// fmt.Println("----------")
+	// fmt.Println(s)
+	// fmt.Println(result)
+	return total
 }
