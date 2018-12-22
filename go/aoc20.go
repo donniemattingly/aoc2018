@@ -86,12 +86,17 @@ func partOne(s string) int {
 	}
 
 	var maxDist = 0
+	var over1kCount = 0
 	for _, dist := range distances {
+		if dist >= 1000 {
+			over1kCount++
+		}
 		if dist > maxDist {
 			maxDist = dist
 		}
 	}
 
+	fmt.Println(over1kCount)
 	return maxDist
 }
 
