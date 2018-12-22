@@ -16,53 +16,83 @@ func main() {
 	fmt.Println(size)
 }
 
-
 /* stack implementation from:
 	https://stackoverflow.com/questions/28541609/looking-for-reasonable-stack-implementation-in-golang
  */
 
-type stack []int
+type Path struct {
+	x, y, dist int
+}
 
-func (s stack) Push(v int) stack {
+type Point struct {
+	x, y interface{}
+}
+
+type stack []Path
+
+func (s stack) Push(v Path) stack {
 	return append(s, v)
 }
 
-func (s stack) Pop() (stack, int) {
+func (s stack) Pop() (stack, Path) {
 	// FIXME: What do we do if the stack is empty, though?
 
 	l := len(s)
-	return  s[:l-1], s[l-1]
+	return s[:l-1], s[l-1]
 }
 
-func (s stack) TakeLast() (stack, int) {
-	return  s[1:], s[0]
+func (s stack) TakeLast() (stack, Path) {
+	return s[1:], s[0]
 }
 
-func partOne(s string) int{
+func partOne(s string) int {
 	var moves stack
-	var distances [] int
+	var distances = make(map[Point]int)
 	var dist = 0
+	var p Path
+	var x = 0
+	var y = 0
 	for _, char := range s {
 		if char == '(' {
-			moves = moves.Push(dist)
+			moves = moves.Push(Path{x, y, dist})
 		} else if char == ')' {
-			moves, dist = moves.Pop()
+			moves, p = moves.Pop()
+			x = p.x
+			y = p.y
+			dist = p.dist
 		} else if char == '|' {
-			dist = moves[0]
+			p = moves[len(moves) - 1]
+			x = p.x
+			y = p.y
+			dist = p.dist
 		} else {
-			dist = dist + 1
-			distances = append(distances, dist)
+			if char == 'E' {
+				x++
+			} else if char == 'W' {
+				x--
+			} else if char == 'N' {
+				y++
+			} else if char == 'S' {
+				y --
+			}
+			dist++
+
+			var curPoint = Point{x,y}
+			var cur = distances[curPoint]
+			if cur == 0 || dist < cur {
+				distances[curPoint] = dist
+			}
 		}
 	}
 
-	var max_dist = 0
+	var maxDist = 0
 	for _, dist := range distances {
-		if dist > max_dist {
-			max_dist = dist
+		if dist > maxDist {
+			maxDist = dist
 		}
 	}
 
-	return max_dist
+	return maxDist
 }
 
 func splitTopLevel(s string) []string {
@@ -79,7 +109,7 @@ func splitTopLevel(s string) []string {
 			last_split = pos + 1
 		}
 	}
-	result = append(result, string(s[last_split:len(s)]))
+	result = append(result, string(s[last_split:]))
 	// fmt.Println("----------")
 	// fmt.Println(s)
 	// fmt.Println(result)
@@ -111,7 +141,7 @@ func foo(s string) int {
 	}
 
 	if lastSplit < len(s) {
-		var newS = string(s[lastSplit:len(s)])
+		var newS = string(s[lastSplit:])
 		base = append(base, newS)
 	}
 
