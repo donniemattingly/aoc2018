@@ -1,0 +1,32 @@
+#ip 4
+0  seti 123 0 3 // set r3 to 123
+1  bani 3 456 3 // bitwise and 123 (reg 3) and 456 (= 72)
+2  eqri 3 72 3 // set r3 to 1 if r3 == 72 (which it does)
+3  addr 3 4 4 // add r3 to r4 (which is ip & thus 4 right now) (this essentiall skips 4 if 2 was true)
+4  seti 0 0 4 // if 4 is false then goto line 2
+5  seti 0 5 3 // if 4 is true then set r3 to 0
+6  bori 3 65536 2 // bitwise or r3 and 65536 (r3 is 0) -> r2 = 65536
+7  seti 10736359 9 3 // set r3 to 
+8  bani 2 255 1 // bitwise and of 255 & r2 -> r1 (r1 = 0 here) (NA)
+9  addr 3 1 3 // r3 = r1 + r3 (NA)
+10 bani 3 16777215 3 
+11 muli 3 65899 3
+12 bani 3 16777215 3 // a lot of ops to get r3 = 3345805;
+13 gtir 256 2 1 // if 256 > r2 then r1 = 1 else r1 = 0 (r2 is 65536 here so r1 = 0)
+14 addr 1 4 4 // r4 = r1 + r4 (ip) (think this is testing to see if we should break)
+15 addi 4 1 4 // r4 = r4 + 1 (skip next line)
+16 seti 27 2 4 // skipped for now
+17 seti 0 3 1 // r1 = 0
+18 addi 1 1 5 // r1 = r1 + 5
+19 muli 5 256 5 // r5 = 256 * 0 (r5 = 0)
+20 gtrr 5 2 5 // r5 > r2 ? r5 = 1 : r5 = 0
+21 addr 5 4 4 // r4 = r5 + r4 (if 20 was true skip next line) 
+22 addi 4 1 4 // skip next line (if 20 was false)
+23 seti 25 8 4 // skipped for now
+24 addi 1 1 1 // r1 = r1 + 1
+25 seti 17 6 4 // r4 = 17 (i.e. jump to 18 (17 + 1))
+26 setr 1 5 2
+27 seti 7 7 4
+28 eqrr 3 0 1
+29 addr 1 4 4
+30 seti 5 1 4
