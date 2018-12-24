@@ -3,6 +3,7 @@
 
 use std::fs::{File};
 use std::io::{BufReader, BufRead};
+use std::collections::HashSet;
 
 type Regs = [isize; 6];
 struct OpCode {
@@ -77,24 +78,28 @@ fn main() {
 
     let mut regs = [0; 6];                                                
     let mut ip = 0;         
-    let mut count = 0;
-    // let instr_max = 10000000000000;
 
-    // regs = [1, 16777216, 16777216, 123, 8, 1];
+    let mut endVals = HashSet::new();
+    let mut endRepeats = false;
 
-    regs[0] = 16311888;
-    while ip < instrs.len(){                                             
+    // guessed 1797946
+    // regs[0] = 16311888;
+        while ip < instrs.len(){                                             
         eval(&instrs[ip], &mut regs);                                     
         regs[ipr] += 1;                                                   
         ip = regs[ipr] as usize; 
-        count += 1;
-        // if(ip == 28){
-            // break;
-        // }
+        
+
+        if(ip == 29){
+            if(endVals.get(&regs[3]).is_some()){
+                println!("val: {}", regs[3]);
+                println!("Found it!");
+                break;
+            } else {
+                endVals.insert(regs[3]);
+            } 
+        }
     }
     println!("ip: {} regs: {}, {}, {}, {}, {}, {}", ip, regs[0], regs[1], regs[2], regs[3], regs[4], regs[5]);                                                                     
 
-
-    println!("part1: {}", regs[0]);  
 }
-

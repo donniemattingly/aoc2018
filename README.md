@@ -29,6 +29,7 @@ My goal for this year is to solve each day's problem in a different language.
 | Day 18 | Nim | [Day 18](/nim/aoc18.nim)|
 | Day 19 | Ruby | [Day 19](/ruby/aoc19.rb)|
 | Day 20 | Go | [Day 20](/go/aoc20.go)|
+| Day 21 | Rust | [Day 21](/rust/src/main.rs)|
 
 
 Languages I'm currently Considering:
