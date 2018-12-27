@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftGraph",
+        "repositoryURL": "https://github.com/davecom/SwiftGraph.git",
+        "state": {
+          "branch": null,
+          "revision": "c25452230b3747aee78564174382c98c0215e867",
+          "version": "2.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

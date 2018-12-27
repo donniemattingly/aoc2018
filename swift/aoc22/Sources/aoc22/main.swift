@@ -1,31 +1,29 @@
-
+import SwiftGraph
 
 struct Terrain {
     var geo: [[Int]]
     var depth: Int
 }
 
-
-
 func generateTerrain(x: Int, y: Int, depth: Int) -> Terrain{
     var geo = Array(repeating: Array(repeating: 0, count: x + 1), count: y + 1)
 
     for i in 0...x {
         for j in 0...y{
-            var val = 0
+            var geoIndex = 0
             if i == x && j == y {
-                val = 0
+                geoIndex = 0
             } else if j == 0 {
-                val = i * 16807
+                geoIndex = i * 16807
 
             } else if i == 0 {
-                val = j * 48271
+                geoIndex = j * 48271
 
             } else {
-                val = geo[j-1][i] * geo[j][i-1]
+                geoIndex = geo[j-1][i] * geo[j][i-1]
             }
 
-            geo[j][i] = ((val + depth) % 20183)
+            geo[j][i] = ((geoIndex + depth) % 20183)
         }
     }
 
@@ -78,4 +76,90 @@ func partOne(input: Input){
     print("Part One: \(riskLevel)")
 }
 
-partOne(input: realInput)
+enum TerrainType {
+    case Rocky, Wet, Narrow
+}
+
+enum Tool {
+    case Neither, Torch, Climbing
+}
+
+struct Vertex: Equatable {
+    var x: Int
+    var y: Int
+    var type: TerrainType
+    var tool: Tool
+
+    static func == (lhs: Vertex, rhs: Vertex) -> Bool {
+        return lhs.x == rhs.x &&
+                lhs.y == rhs.y &&
+                lhs.type == rhs.type &&
+                lhs.tool == rhs.tool
+    }
+}
+
+struct Point: Equatable, Hashable {
+    var x: Int
+    var y: Int
+
+    static func == (lhs: Point, rhs: Point) -> Bool {
+        return lhs.x == rhs.x &&
+                lhs.y == rhs.y
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(x)
+        hasher.combine(y)
+    }
+}
+
+func terrainToVertices(terrain: Terrain) -> ([Vertex], Dictionary<Point, [Vertex]>) {
+    // each square is actually two vertices (one for each possible tool)
+    let arr = terrain.geo
+    var vertices: [Vertex] = []
+    var gridDict: Dictionary<Point, [Vertex]> = Dictionary()
+
+    for j in 0..<arr.count {
+        for i in 0..<arr[0].count {
+            let terrainType = arr[j][i] % 3
+            var v: [Vertex] = []
+            if(terrainType == 0){
+                // Rocky (Climbing / Torch)
+                v = [Vertex(x: i, y: j, type: .Rocky, tool: .Climbing), Vertex(x: i, y: j, type: .Rocky, tool: .Torch)]
+            } else if(terrainType == 1){
+                // Wet (Climbing / Neither)
+                v = [Vertex(x: i, y: j, type: .Wet, tool: .Climbing), Vertex(x: i, y: j, type: .Wet, tool: .Neither)]
+            } else {
+                // Narrow (Torch / Neither)
+                v = [Vertex(x: i, y: j, type: .Narrow, tool: .Torch), Vertex(x: i, y: j, type: .Narrow, tool: .Neither)]
+            }
+
+            vertices.append(contentsOf: v)
+            gridDict[Point(x: i, y: j)] = v
+        }
+    }
+
+    return (vertices, gridDict)
+}
+
+func generateGraph(terrain: Terrain) -> WeightedGraph<Vertex, Int> {
+    let (vertices, gridDict) = terrainToVertices(terrain: terrain)
+    let graph = WeightedGraph<Vertex, Int>()
+
+    for j in 0..<terrain.geo.count {
+        for i in 0..<terrain.geo[0].count{
+            
+        }
+    }
+    return graph
+}
+
+func partTwo(input: Input){
+    let terrain = generateTerrain(x: input.x, y: input.y, depth: input.depth)
+    let graph = generateGraph(terrain: terrain)
+
+    print(graph)
+}
+
+//partOne(input: realInput)
+partTwo(input: testInput)
