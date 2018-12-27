@@ -1,7 +1,7 @@
 import XCTest
 
-import swiftTests
+import aoc22Tests
 
 var tests = [XCTestCaseEntry]()
-tests += swiftTests.allTests()
+tests += aoc22Tests.allTests()
 XCTMain(tests)
