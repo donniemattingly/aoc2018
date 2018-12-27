@@ -144,11 +144,21 @@ func terrainToVertices(terrain: Terrain) -> ([Vertex], Dictionary<Point, [Vertex
 
 func generateGraph(terrain: Terrain) -> WeightedGraph<Vertex, Int> {
     let (vertices, gridDict) = terrainToVertices(terrain: terrain)
-    let graph = WeightedGraph<Vertex, Int>()
 
-    for j in 0..<terrain.geo.count {
-        for i in 0..<terrain.geo[0].count{
-            
+    // add all vertices
+    let graph = WeightedGraph<Vertex, Int>(vertices: vertices)
+
+    for j: Int in 0..<terrain.geo.count {
+        for i: Int in 0..<terrain.geo[0].count{
+            let v = gridDict[Point(x: i, y: j)]!
+            let neighbors: [Vertex] = [
+                gridDict[i - 1, j],
+                gridDict[i + 1, j],
+                gridDict[i, j - 1],
+                gridDict[i, j + 1]
+            ].flatMap { (vs: [Vertex]?) -> [Vertex]? in
+                vs ?? []
+            }
         }
     }
     return graph
