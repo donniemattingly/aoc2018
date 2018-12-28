@@ -30,6 +30,7 @@ My goal for this year is to solve each day's problem in a different language.
 | Day 19 | Ruby | [Day 19](/ruby/aoc19.rb)|
 | Day 20 | Go | [Day 20](/go/aoc20.go)|
 | Day 21 | Rust | [Day 21](/rust/src/main.rs)|
+| Day 22 | Swift | [Day 22](/swift/aoc22/main.swift)|
 
 
 Languages I'm currently Considering:
