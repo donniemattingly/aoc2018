@@ -16,7 +16,7 @@ let package = Package(
         .target(
             name: "aoc22",
             dependencies: [
-                "SwiftGraph"
+//                "SwiftGraph"
             ]),
         .testTarget(
             name: "aoc22Tests",
