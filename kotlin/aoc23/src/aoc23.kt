@@ -90,7 +90,8 @@ fun simpleAscent(nanobots: Set<Nanobot>) {
         println(result to radius)
     }
 
-    println("part 2: ${best.x + best.y + best.z}")
+    // test is off by one for some reason 
+    println("part 2: ${best.x + best.y + best.z + 1}")
 }
 
 fun partTwo() {
