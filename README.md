@@ -33,6 +33,7 @@ My goal for this year is to solve each day's problem in a different language.
 | Day 22 | Swift | [Day 22](/swift/aoc22/Sources/aoc22/main.swift)|
 | Day 23 | Kotlin | [Day 23](/kotlin/aoc23/src/aoc23.kt)|
 | Day 24 | Python | [Day 24](/python/aoc24.py)|
+| Day 25 | JavaScript| [Day 25](/javascript/aoc25.js)|
 
 
 Languages I'm currently Considering:
