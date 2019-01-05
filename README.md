@@ -32,6 +32,8 @@ My goal for this year is to solve each day's problem in a different language.
 | Day 21 | Rust | [Day 21](/rust/src/main.rs)|
 | Day 22 | Swift | [Day 22](/swift/aoc22/Sources/aoc22/main.swift)|
 | Day 23 | Kotlin | [Day 23](/kotlin/aoc23/src/aoc23.kt)|
+| Day 24 | Python | [Day 24](/python/aoc24.py)|
+
 
 Languages I'm currently Considering:
 
