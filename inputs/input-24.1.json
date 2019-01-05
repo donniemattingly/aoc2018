@@ -1,0 +1,272 @@
+{
+  "immune": [
+    {
+      "count": 4445,
+      "hp": 10125,
+      "types": {
+        "weak": [],
+        "immune": [
+          "radiation"
+        ]
+      },
+      "attackPower": 20,
+      "attackType": "cold",
+      "initiative": 16
+    },
+    {
+      "count": 722,
+      "hp": 9484,
+      "attackPower": 130,
+      "attackType": "bludgeoning",
+      "initiative": 6
+    },
+    {
+      "count": 1767,
+      "hp": 5757,
+      "types": {
+        "weak": [
+          "fire",
+          "radiation"
+        ],
+        "immune": []
+      },
+      "attackPower": 27,
+      "attackType": "radiation",
+      "initiative": 4
+    },
+    {
+      "count": 1472,
+      "hp": 7155,
+      "types": {
+        "weak": [
+          "slashing",
+          "bludgeoning"
+        ],
+        "immune": []
+      },
+      "attackPower": 42,
+      "attackType": "radiation",
+      "initiative": 20
+    },
+    {
+      "count": 2610,
+      "hp": 5083,
+      "types": {
+        "weak": [
+          "slashing",
+          "fire"
+        ],
+        "immune": []
+      },
+      "attackPower": 14,
+      "attackType": "fire",
+      "initiative": 17
+    },
+    {
+      "count": 442,
+      "hp": 1918,
+      "attackPower": 35,
+      "attackType": "fire",
+      "initiative": 8
+    },
+    {
+      "count": 2593,
+      "hp": 1755,
+      "types": {
+        "weak": [],
+        "immune": [
+          "bludgeoning",
+          "radiation",
+          "fire"
+        ]
+      },
+      "attackPower": 6,
+      "attackType": "slashing",
+      "initiative": 13
+    },
+    {
+      "count": 6111,
+      "hp": 1395,
+      "types": {
+        "weak": [
+          "bludgeoning"
+        ],
+        "immune": [
+          "radiation",
+          "fire"
+        ]
+      },
+      "attackPower": 1,
+      "attackType": "slashing",
+      "initiative": 14
+    },
+    {
+      "count": 231,
+      "hp": 3038,
+      "types": {
+        "weak": [],
+        "immune": [
+          "radiation"
+        ]
+      },
+      "attackPower": 128,
+      "attackType": "cold",
+      "initiative": 15
+    },
+    {
+      "count": 3091,
+      "hp": 6684,
+      "types": {
+        "weak": [
+          "radiation"
+        ],
+        "immune": [
+          "slashing"
+        ]
+      },
+      "attackPower": 17,
+      "attackType": "cold",
+      "initiative": 19
+    }
+  ],
+  "infection": [
+    {
+      "count": 1929,
+      "hp": 13168,
+      "types": {
+        "weak": [
+          "bludgeoning"
+        ],
+        "immune": []
+      },
+      "attackPower": 13,
+      "attackType": "fire",
+      "initiative": 7
+    },
+    {
+      "count": 2143,
+      "hp": 14262,
+      "types": {
+        "weak": [],
+        "immune": [
+          "radiation"
+        ]
+      },
+      "attackPower": 12,
+      "attackType": "fire",
+      "initiative": 10
+    },
+    {
+      "count": 1380,
+      "hp": 20450,
+      "types": {
+        "weak": [
+          "slashing",
+          "slashing"
+        ],
+        "immune": [
+          "bludgeoning",
+          "bludgeoning"
+        ]
+      },
+      "attackPower": 28,
+      "attackType": "cold",
+      "initiative": 12
+    },
+    {
+      "count": 4914,
+      "hp": 6963,
+      "types": {
+        "weak": [
+          "slashing"
+        ],
+        "immune": [
+          "fire"
+        ]
+      },
+      "attackPower": 2,
+      "attackType": "cold",
+      "initiative": 11
+    },
+    {
+      "count": 1481,
+      "hp": 14192,
+      "types": {
+        "weak": [
+          "slashing",
+          "fire"
+        ],
+        "immune": [
+          "radiation"
+        ]
+      },
+      "attackPower": 17,
+      "attackType": "bludgeoning",
+      "initiative": 3
+    },
+    {
+      "count": 58,
+      "hp": 40282,
+      "types": {
+        "weak": [
+          "cold",
+          "slashing"
+        ],
+        "immune": []
+      },
+      "attackPower": 1346,
+      "attackType": "radiation",
+      "initiative": 9
+    },
+    {
+      "count": 2268,
+      "hp": 30049,
+      "types": {
+        "weak": [],
+        "immune": [
+          "cold",
+          "slashing",
+          "radiation"
+        ]
+      },
+      "attackPower": 24,
+      "attackType": "radiation",
+      "initiative": 5
+    },
+    {
+      "count": 3562,
+      "hp": 22067,
+      "attackPower": 9,
+      "attackType": "fire",
+      "initiative": 18
+    },
+    {
+      "count": 4874,
+      "hp": 37620,
+      "types": {
+        "weak": [
+          "cold"
+        ],
+        "immune": [
+          "bludgeoning"
+        ]
+      },
+      "attackPower": 13,
+      "attackType": "bludgeoning",
+      "initiative": 1
+    },
+    {
+      "count": 4378,
+      "hp": 32200,
+      "types": {
+        "weak": [
+          "cold"
+        ],
+        "immune": []
+      },
+      "attackPower": 10,
+      "attackType": "bludgeoning",
+      "initiative": 2
+    }
+  ]
+}
