@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-
+from copy import deepcopy
 
 @dataclass()
 class Group:
@@ -98,7 +98,7 @@ def get_and_parse_input(filename):
     immunes = []
     infections = []
     group_id = 0
-    with open("../inputs/input-24.1.txt", "r") as f:
+    with open(filename, "r") as f:
         imm = False
         for line in f.readlines():
             line = line.strip()
@@ -169,27 +169,31 @@ def get_input(filename):
 
         return immune, infection
 
+should_print = False
+
 
 def print_starting_stats(army):
-    if not army:
-        print('No groups remain.')
-    else:
-        print(f'{army[0].army}:')
-        for x in army:
-            print(f'Group {x.name} contains {x.count} units')
+    if should_print:
+        if not army:
+            print('No groups remain.')
+        else:
+            print(f'{army[0].army}:')
+            for x in army:
+                print(f'Group {x.name} contains {x.count} units')
 
 
 def print_target(a, b):
-    if b:
+    if b and should_print:
         print(f'{a.army} group {a.name} would deal defending group {b.name} {a.calc_damage(b)} damage')
 
 
 def print_attack(a, b, killed):
-    if b:
+    if b and should_print:
         print(f'{a.army} group {a.name} attacks defending group {b.name}, killing {killed} units')
 
 
 def run_round(immune, infection):
+    total_killed = 0
     immune_targets = set(immune)
     infection_targets = set(infection)
 
@@ -198,7 +202,7 @@ def run_round(immune, infection):
     print_starting_stats(immune)
     print_starting_stats(infection)
 
-    print('')
+    if should_print: print('')
 
     # Targeting
     for g in sorted(infection, key=lambda x: (x.effective_power(), x.initiative), reverse=True):
@@ -213,12 +217,13 @@ def run_round(immune, infection):
             infection_targets.remove(s)
         selections.append((g, s))
 
-    print('')
+    if should_print: print('')
 
     # Attacking
     for g, o in sorted(selections, key=lambda x: x[0].initiative, reverse=True):
         if o:
             killed = g.attack(o)
+            total_killed += killed
             print_attack(g, o, killed)
 
     new_immune = [x for x in immune if x.count > 0]
@@ -226,15 +231,13 @@ def run_round(immune, infection):
 
     # print('\n ----- ----- -----\n')
 
-    return new_immune, new_infection
+    return new_immune, new_infection, total_killed
 
 
 def part_one(filename):
     immune, infection = get_and_parse_input(filename)
-    count = 5
-    while len(immune) * len(infection) > 0 and count is not 0:
-        immune, infection = run_round(immune, infection)
-        # count -= 1
+    while len(immune) * len(infection) > 0:
+        immune, infection, _ = run_round(immune, infection)
 
     print_starting_stats(immune)
     print_starting_stats(infection)
@@ -248,10 +251,32 @@ def part_one(filename):
         print(f'part 1: {sum([x.count for x in infection])}')
 
 
+def part_two(filename):
+    immune, infection = get_and_parse_input(filename)
+    boost = 0
+    cur_immune = []
+    stalemate = False
+    while not cur_immune or stalemate:
+        cur_immune = deepcopy(immune)
+        cur_infection = deepcopy(infection)
+        print(f'Boost: {boost}')
+        for x in cur_immune:
+            x.ap += boost
+        stalemate = False
+        while (len(cur_immune) > 0 and len(cur_infection) > 0) and not stalemate:
+            cur_immune, cur_infection, total_kills = run_round(cur_immune, cur_infection)
+            stalemate = total_kills == 0
+            if stalemate:
+                print('Stalemate!')
+
+        boost += 1
+
+    print(f'Part 2: {sum([x.count for x in cur_immune])}')
+
 def main():
     test_file = "../inputs/input-24.0.txt"
     real_file = "../inputs/input-24.1.txt"
-    part_one(real_file)
+    part_two(real_file)
 
 
 main()
